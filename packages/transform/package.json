@@ -1,6 +1,6 @@
 {
   "name": "@variomotion/transform",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Animation library, create and maintain (parallax)animations the easy way",
   "repository": {
     "type": "git",

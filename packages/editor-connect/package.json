@@ -1,6 +1,6 @@
 {
   "name": "@variomotion/editor-connect",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Animation library, create and maintain (parallax)animations the easy way",
   "repository": {
     "type": "git",
@@ -33,8 +33,8 @@
   },
   "keywords": [],
   "dependencies": {
-    "@variomotion/core": "^1.0.0-beta.1",
-    "@variomotion/transform": "^1.0.0-beta.1"
+    "@variomotion/core": "^1.0.0-beta.2",
+    "@variomotion/transform": "^1.0.0-beta.2"
   },
   "publishConfig": {
     "access": "public"
