@@ -30,5 +30,8 @@
     "tsup": "^8.0.1",
     "typescript": "^5.3.2"
   },
-  "keywords": []
+  "keywords": [],
+  "publishConfig": {
+    "access": "public"
+  }
 }

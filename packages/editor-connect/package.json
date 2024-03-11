@@ -35,5 +35,8 @@
   "dependencies": {
     "@variomotion/core": "^1.0.0-beta.1",
     "@variomotion/transform": "^1.0.0-beta.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -21,7 +21,7 @@ fs.writeFileSync(path.resolve(__dirname, './localconfig.json'), JSON.stringify(c
 
 
 const command2 = spawn(`node`, [`${__dirname}/socket.js`, '--port=5454']);
-const command = spawn(`npx`, ['variomotion-editor']);
+const command = spawn(`npx`, ['@variomotion/editor']);
 const command3 = spawn(`node`, [`${__dirname}/open.js`, `--url=${argv.url}`,  `--socketPort=${config.socketPort}`]);
 
 
