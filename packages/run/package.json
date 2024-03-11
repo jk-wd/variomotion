@@ -1,0 +1,25 @@
+{
+  "name": "@variomotion/run",
+  "type": "module",
+  "version": "1.0.0-beta.1",
+  "bin": {
+    "variomotion": "src/cli.js"
+  },
+  "main": "src/cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "socket": "node src/socket.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@variomotion/editor": "^1.0.0-beta.1",
+    "open": "^10.0.0",
+    "ws": "^8.14.2",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "async": "^3.2.5"
+  }
+}
