@@ -6,7 +6,7 @@ import http from 'http'
 import { hideBin } from 'yargs/helpers'
 import open from 'open';
 
-let startPort = 5173
+let startPort = 6622
 let port = startPort
 const maxAttempts = 15
 let attempts = 0
@@ -25,7 +25,7 @@ async function openLoop() {
             const response = await fetch(`http://localhost:${port}/heartbeat`)
             if(response.status === 200) {
                    console.log(port, response.status)
-                open(`http://localhost:5173/?siteurl=${encodeURIComponent(argv.url)}&socketport=${argv.socketPort ?? 7766}`);
+                open(`http://localhost:${port}/?siteurl=${encodeURIComponent(argv.url)}&socketport=${argv.socketPort ?? 7766}`);
             }
             
             clearTimeout(timeout)

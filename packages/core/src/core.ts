@@ -51,6 +51,7 @@ let animationFrameId: number;
 let animationData: IAnimationData;
 let onUpdateAnimationDataCallback: (animationData: IAnimationData) => void;
 let activeBreakpoint: IActiveBreakpoint = { id: NoBreakpointIdentifier };
+let lastPixel: number | null = 0;
 const onAnimationFrameCallbacks: (() => void)[] = [];
 
 export const setOnAnimationFrameCallback = (callback: () => void) => {
@@ -339,7 +340,7 @@ const prepareTimelinState = (timelineId: string) => {
     : timelineStates[timeline.id];
 
   if (timelineState) {
-    let lastPixel: number | null = 0;
+    
     for (const animation of animations) {
       if (timeline.id !== animation.timelineId) {
         continue;
@@ -368,7 +369,6 @@ const prepareTimelinState = (timelineId: string) => {
     if (
       lastPixel
     ) {
-      console.log(wrapperClientHeight)
       wrapper.style.height = `${lastPixel + wrapperClientHeight}px`;
     }
   }

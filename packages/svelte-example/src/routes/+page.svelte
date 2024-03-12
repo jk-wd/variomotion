@@ -5,7 +5,6 @@
   import animationData from "../animations/animation.json";
 
   onMount(async () => {
-    console.log("MOUNTED!");
     if (dev) {
       const { connectEditor } = await import("@variomotion/editor-connect");
       const varioConfig = await import("../../vario.config.json");

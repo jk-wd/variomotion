@@ -1,7 +1,6 @@
 let socket: WebSocket | undefined;
 
 export const setupSocket = async (port: number) => {
-  console.log("setupSocket", socket);
   if (socket) {
     return socket;
   }
