@@ -1,6 +1,6 @@
 {
   "name": "@variomotion/editor",
-  "version": "1.0.0-beta.8",
+  "version": "1.0.0-beta.9",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -21,9 +21,9 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@types/match-media-mock": "^0.1.8",
     "@types/uuid": "^9.0.7",
-    "@variomotion/core": "^1.0.0-beta.8",
-    "@variomotion/editor-connect": "^1.0.0-beta.8",
-    "@variomotion/transform": "^1.0.0-beta.8",
+    "@variomotion/core": "^1.0.0-beta.9",
+    "@variomotion/editor-connect": "^1.0.0-beta.9",
+    "@variomotion/transform": "^1.0.0-beta.9",
     "async": "^3.2.5",
     "match-media-mock": "^0.1.1",
     "open": "^10.0.0",
