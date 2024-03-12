@@ -18,15 +18,18 @@ import {
   tearDownTransform,
 } from "@variomotion/transform";
 import {
+  connectVariomotion,
   getActiveFrame,
   setActiveFrame,
   setDomTargetDimensions,
   setupTransformCanvas,
 } from "./transform-canvas";
 
+
 let scrollToInterval: NodeJS.Timeout;
 let socketChannelId: string | undefined;
 let fileName: string;
+let connected: boolean = false;
 
 export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
   const socket = getSocket();
@@ -48,7 +51,10 @@ export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
 export const sendTimelineStatesToEditor = (variomotion: VariomotionLib) => {
   sendSiteEvent(
     "send-timeline-states-to-editor",
-    variomotion.getTimelineStates()
+    {
+      timelineStates: variomotion.getTimelineStates(),
+      pixelTimelineStates: variomotion.getPixelTimelineStates(),
+    }
   );
 };
 
@@ -58,6 +64,7 @@ export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
 
 export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
   const animaitonData = variomotion.getAnimationData();
+
   sendSiteEvent("send-animation-data-to-editor", {
     ...variomotion.getAnimationData(),
     metaData: {
@@ -67,20 +74,32 @@ export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
   });
 };
 
-export const connect = async (variomotion: VariomotionLib, port: number) => {
-  await setupSocket(port);
+export const connectEditor = async (
+  variomotion: VariomotionLib,
+  socketPort: number
+) => {
+  if(connected) {
+    return
+  }
+  await setupSocket(socketPort);
+  
   const socket = getSocket();
+  
   const url = variomotion.getOptions().url;
-  fileName = url?.split("/").pop() ?? "";
+  const animaitonData = variomotion.getAnimationData();
+  fileName = animaitonData?.metaData?.fileName ? animaitonData?.metaData?.fileName : url?.split("/").pop() ?? "";
   socketChannelId =
     new URL(window.location.href).searchParams.get("socketChannelId") ??
     undefined;
 
+  connectVariomotion(variomotion);
+  sendAnimationDataToEditor(variomotion);
   setDomTargetDimensions();
 
   socket.addEventListener("message", (message) => {
     const event = JSON.parse(message.data) as SocketEvent;
     if (event.type === "send-animation-data-to-site") {
+    
       variomotion.updateAnimationData(event.data as IAnimationData);
       tearDownTransform();
       const activeFrame = getActiveFrame();
@@ -165,8 +184,6 @@ export const connect = async (variomotion: VariomotionLib, port: number) => {
       }
     }
   });
-
-  sendAnimationDataToEditor(variomotion);
-
+  connected = true
   return variomotion;
 };

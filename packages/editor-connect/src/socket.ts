@@ -1,13 +1,14 @@
 let socket: WebSocket | undefined;
 
 export const setupSocket = async (port: number) => {
+  console.log("setupSocket", socket);
   if (socket) {
     return socket;
   }
   return new Promise<WebSocket>((resolve) => {
-    const socket = new WebSocket("ws://localhost:" + port);
+    socket = new WebSocket("ws://localhost:" + port);
     socket.addEventListener("open", () => {
-      resolve(socket);
+      resolve(socket!);
     });
   });
 };

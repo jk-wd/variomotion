@@ -1,0 +1,4 @@
+{
+  "animationFiles": "./src/animations",
+  "socketPort": 7799
+}

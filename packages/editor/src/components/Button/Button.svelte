@@ -15,8 +15,10 @@
 
 <style>
   .button {
+    outline: none;
+    border: none;
     background: #fff;
-    padding: 6px 14px;
+    padding: 8px 14px;
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
@@ -29,12 +31,12 @@
   }
 
   .button.small {
-    padding: 4px 8px;
+    padding: 6px 8px;
     font-family: "ProximaNova-Bold";
     font-size: 14px;
   }
   .button.tiny {
-    padding: 2px 6px;
+    padding: 4px 6px;
     font-family: "ProximaNova-Regular";
     font-size: 12px;
   }

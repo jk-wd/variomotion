@@ -29,7 +29,7 @@
 <style>
   .filters {
     position: relative;
-
+    top: -2px;
     align-self: flex-end;
   }
 </style>

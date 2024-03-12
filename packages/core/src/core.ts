@@ -339,6 +339,7 @@ const prepareTimelinState = (timelineId: string) => {
     : timelineStates[timeline.id];
 
   if (timelineState) {
+    let lastPixel: number | null = 0;
     for (const animation of animations) {
       if (timeline.id !== animation.timelineId) {
         continue;
@@ -348,6 +349,10 @@ const prepareTimelinState = (timelineId: string) => {
         getEndFromAnimationProps(animation.animationProps),
         end
       );
+      if (timeline.pixelBased) {
+        lastPixel = Math.max(((timelineState.start ?? 0) + timelineState.duration), lastPixel)
+      }
+      
     }
     for (const sequenceAnimation of sequenceAnimations) {
       if (timeline.id !== sequenceAnimation.timelineId) {
@@ -357,15 +362,14 @@ const prepareTimelinState = (timelineId: string) => {
       const sequenceEnd = getEndFromSequenceAnimation(sequenceAnimation);
       timelineState.duration = Math.max(sequenceEnd, end);
       if (timeline.pixelBased) {
-        const totalDuration =
-          (timelineState.start ?? 0) + timelineState.duration;
-        if (
-          !wrapper.style.height ||
-          totalDuration > parseInt(wrapper.style.height)
-        ) {
-          wrapper.style.height = `${totalDuration + wrapperClientHeight}px`;
-        }
+        lastPixel = Math.max(((timelineState.start ?? 0) + timelineState.duration), lastPixel)
       }
+    }
+    if (
+      lastPixel
+    ) {
+      console.log(wrapperClientHeight)
+      wrapper.style.height = `${lastPixel + wrapperClientHeight}px`;
     }
   }
 };
@@ -585,13 +589,18 @@ export const getOptions = () => {
   return options;
 };
 
-export const init = async (wrapperQuery: string, optionsParam?: IOptions) => {
-  wrapper = document.querySelector(wrapperQuery) as HTMLElement;
-  wrapperClientHeight = wrapper.clientHeight;
+export const init = async (optionsParam?: IOptions) => {
+  if(animationData) {
+    processAnimationData();
+    return;
+  }
+  
+  wrapper = optionsParam?.wrapper ?? document.body;
+  wrapperClientHeight = optionsParam?.wrapper ? wrapper.clientHeight: window.innerHeight;
   options = {
     ...optionsParam,
   };
-
+  animationData = options.animationData ? options.animationData as IAnimationData : animationData;
   const animationDataFetch = await fetchAnimationJSON();
   if (animationDataFetch) {
     animationData = animationDataFetch;

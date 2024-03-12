@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const config = JSON.parse(fs.readFileSync(path.resolve(__dirname, './localconfig.json')));
+const config = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../localconfig.json')));
+
 const wss = new WebSocketServer({
   port: config.socketPort ?? 7766,
   perMessageDeflate: {
@@ -37,6 +38,9 @@ let sites = {}
 
 
 function saveFile(animationData) {  
+  if(!animationData.metaData.fileName) {
+    return
+  }
   fs.writeFileSync(`${path.resolve(config.animationFiles)}/${animationData.metaData.fileName}`, JSON.stringify(animationData))
   console.log('file saved')
 }

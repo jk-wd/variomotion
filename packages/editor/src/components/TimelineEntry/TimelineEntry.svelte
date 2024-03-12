@@ -66,7 +66,7 @@
 <style>
   .entry-buttons {
     position: absolute;
-    top: 6px;
+    top: 0;
     right: 6px;
   }
   .entry {

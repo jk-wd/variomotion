@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   export let siteUrl = "about:blank";
   export let width: number | null = null;
+  console.log("MOUNTED I FRAME");
 </script>
 
 <iframe

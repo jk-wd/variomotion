@@ -42,6 +42,7 @@
       return;
     }
     progress = timelineState.progress ?? 0;
+
     paused = timelineState.pause;
   });
 

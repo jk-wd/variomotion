@@ -1,0 +1,173 @@
+<script lang="ts">
+  import { dev } from "$app/environment";
+  import { onMount } from "svelte";
+  import variomotion from "@variomotion/core";
+  import animationData from "../animations/animation.json";
+
+  onMount(async () => {
+    console.log("MOUNTED!");
+    if (dev) {
+      const { connectEditor } = await import("@variomotion/editor-connect");
+      const varioConfig = await import("../../vario.config.json");
+
+      await variomotion.init({
+        animationData,
+      });
+      await connectEditor(variomotion, varioConfig.socketPort);
+    } else {
+      await variomotion.init({
+        animationData,
+      });
+    }
+  });
+</script>
+
+<div class="main">
+  <div class="scroll-down">
+    <h1 data-v="scroll-down" class="">scroll down</h1>
+  </div>
+  <div data-v="logo" class="logo">
+    <div class="svg-wrapper">
+      <svg
+        data-v="logo-svg"
+        version="1.1"
+        id="Layer_1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px"
+        y="0px"
+        viewBox="0 0 147.63 177.41"
+        style="enable-background:new 0 0 147.63 177.41;"
+        xml:space="preserve"
+      >
+        <g>
+          <path
+            style="fill:#FFFFFF;"
+            d="M85.99,21.25c-2.97,0.79-5.8,2.04-8.4,3.69L36.27,51.27c-6.79,4.27-11.47,11.19-12.89,19.09
+		c-1.43,8.04,0.44,16.32,5.19,22.97c7.84,11.31,21.91,16.52,35.22,13.06c2.97-0.79,5.8-2.04,8.4-3.68l15.77-10.05
+		c0.78-0.5,1.64-0.87,2.53-1.11c4.01-1.04,8.25,0.53,10.61,3.94c1.43,2,1.99,4.5,1.57,6.92c-0.43,2.38-1.84,4.46-3.88,5.75
+		l-41.31,26.34c-0.78,0.5-1.64,0.87-2.53,1.11c-4.01,1.04-8.25-0.53-10.61-3.94c-1.26-1.78-1.85-3.96-1.67-6.14l0.14-1.53
+		l-1.53-0.47c-5.81-1.75-11.27-4.49-16.16-8.08l-2.12-1.55l-0.78,2.38c-0.42,1.26-0.75,2.55-0.99,3.86
+		c-1.43,8.04,0.44,16.32,5.19,22.97c7.84,11.31,21.91,16.52,35.22,13.06c2.97-0.79,5.8-2.04,8.4-3.69l41.32-26.32
+		c6.79-4.27,11.46-11.2,12.88-19.09c1.43-8.04-0.44-16.32-5.19-22.97c-7.84-11.31-21.9-16.52-35.22-13.06
+		c-2.97,0.79-5.8,2.04-8.4,3.69L59.66,84.76c-0.78,0.5-1.64,0.87-2.53,1.11c-4.01,1.04-8.25-0.53-10.61-3.94
+		c-1.43-2.01-1.99-4.5-1.56-6.93c0.43-2.38,1.84-4.46,3.88-5.75l41.32-26.34c0.78-0.5,1.64-0.87,2.53-1.11
+		c4.01-1.04,8.25,0.53,10.61,3.94c1.26,1.79,1.85,3.96,1.67,6.14l-0.14,1.53l1.54,0.47c5.81,1.75,11.27,4.49,16.16,8.08l2.12,1.55
+		l0.78-2.38c0.42-1.26,0.75-2.55,0.99-3.86c1.43-8.04-0.44-16.32-5.19-22.97C113.37,23.01,99.3,17.79,85.99,21.25z"
+          />
+          <path
+            style="fill:#FF3E00;"
+            d="M138.22,23.47L138.22,23.47C121.74-0.1,89.2-7.09,65.68,7.89L24.37,34.23
+		C13.08,41.32,5.3,52.85,2.95,65.97C0.98,76.91,2.71,88.18,7.87,98.02c-3.54,5.36-5.95,11.39-7.09,17.71
+		c-2.38,13.38,0.73,27.14,8.63,38.2c16.47,23.58,49.01,30.57,72.53,15.58l41.32-26.33c11.29-7.1,19.06-18.62,21.41-31.75
+		c1.97-10.93,0.25-22.21-4.91-32.05c3.53-5.36,5.95-11.39,7.09-17.71C149.23,48.3,146.12,34.53,138.22,23.47z M126.4,57.28
+		c-0.24,1.31-0.57,2.6-0.99,3.86l-0.78,2.38l-2.12-1.55c-4.89-3.59-10.35-6.33-16.16-8.08l-1.54-0.47l0.14-1.53
+		c0.19-2.18-0.4-4.36-1.67-6.14c-2.36-3.41-6.6-4.98-10.61-3.94c-0.9,0.24-1.75,0.61-2.53,1.11L48.83,69.25
+		c-2.04,1.29-3.45,3.37-3.88,5.75c-0.43,2.42,0.13,4.92,1.56,6.93c2.36,3.41,6.6,4.98,10.61,3.94c0.9-0.24,1.75-0.61,2.53-1.11
+		l15.76-10.05c2.59-1.65,5.42-2.89,8.4-3.69c13.32-3.46,27.38,1.75,35.22,13.06c4.75,6.65,6.62,14.93,5.19,22.97
+		c-1.42,7.89-6.09,14.82-12.88,19.09l-41.32,26.32c-2.59,1.65-5.42,2.9-8.4,3.69c-13.32,3.46-27.38-1.75-35.22-13.06
+		c-4.75-6.65-6.62-14.93-5.19-22.97c0.24-1.31,0.57-2.6,0.99-3.86l0.78-2.38l2.12,1.55c4.89,3.59,10.35,6.32,16.16,8.08l1.53,0.47
+		l-0.14,1.53c-0.19,2.18,0.4,4.35,1.67,6.14c2.36,3.41,6.6,4.98,10.61,3.94c0.9-0.24,1.75-0.61,2.53-1.11l41.31-26.34
+		c2.04-1.29,3.45-3.37,3.88-5.75c0.43-2.42-0.14-4.92-1.57-6.92c-2.36-3.41-6.6-4.98-10.61-3.94c-0.9,0.24-1.75,0.61-2.53,1.11
+		L72.19,102.7c-2.59,1.65-5.43,2.89-8.4,3.68c-13.32,3.46-27.38-1.75-35.22-13.06c-4.75-6.65-6.62-14.93-5.19-22.97
+		c1.42-7.89,6.1-14.82,12.89-19.09l41.32-26.33c2.59-1.65,5.43-2.89,8.4-3.69c13.32-3.46,27.38,1.75,35.22,13.06
+		C125.96,40.96,127.83,49.24,126.4,57.28z"
+          />
+        </g>
+      </svg>
+      <div class="circles">
+        <div data-v="circle" class="circle circleA"></div>
+        <div data-v="circle" class="circle circleB"></div>
+        <div data-v="circle" class="circle circleC"></div>
+        <div data-v="circle" class="circle circleD"></div>
+      </div>
+      <div class="circles circles2">
+        <div data-v="circle2" class="circle circle2 circleA"></div>
+        <div data-v="circle2" class="circle circle2 circleB"></div>
+        <div data-v="circle2" class="circle circle2 circleC"></div>
+        <div data-v="circle2" class="circle circle2 circleD"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .main {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+  }
+  .scroll-down h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+  .scroll-down {
+    position: fixed;
+    color: #ff3e00;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height: 500px;
+  }
+  .svg-wrapper {
+    width: 100px;
+    height: 100px;
+    position: relative;
+  }
+  .svg-wrapper svg {
+    width: 100px;
+    height: 100px;
+  }
+  .circles {
+    z-index: -1;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 130px;
+    height: 130px;
+    transform: translate(-50%, -50%);
+  }
+  .circles.circles2 {
+    z-index: 1;
+  }
+  .circle {
+    filter: blur(60px);
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 100%;
+    background-color: #ff3e00;
+  }
+  .circle.circle2 {
+    background-color: rgba(0, 0, 0, 0);
+    border: 8px solid white;
+
+    filter: blur(2px);
+  }
+  .circleA {
+    rotate: 0deg;
+  }
+  .circleB {
+    rotate: 90deg;
+  }
+  .circleC {
+    rotate: 180deg;
+  }
+  .circleD {
+    rotate: 270deg;
+  }
+  :global(body) {
+    background-color: white;
+  }
+</style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "../app.css";
   import { onMount } from "svelte";
   import {
     initEditorSocket,
@@ -44,6 +43,7 @@
   let sendAnimationDataLocked = false;
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
+
     const socketPort = urlParams.get("socketport");
     if (!socketPort) {
       throw new Error("socketPort is not defined");
@@ -79,8 +79,8 @@
   });
 
   transformMode.subscribe((mode) => {
-    if(!$socketState.socket){
-      return;  
+    if (!$socketState.socket) {
+      return;
     }
     if (!$selectedFrame) {
       sendFrameDeSelectedEventToSite(null);
@@ -96,8 +96,8 @@
   });
 
   selectedFrame.subscribe((frame) => {
-    if(!$socketState.socket){
-      return;  
+    if (!$socketState.socket) {
+      return;
     }
     if (frame) {
       sendFrameSelectedEventToSite({
@@ -113,8 +113,8 @@
   });
 
   translateBoolean.subscribe((value) => {
-    if(!$socketState.socket){
-      return;  
+    if (!$socketState.socket) {
+      return;
     }
     if (value) {
       sendTranslateBooleanEventToSite(value);
@@ -122,8 +122,8 @@
   });
 
   scaleProportianally.subscribe((value) => {
-    if(!$socketState.socket){
-      return;  
+    if (!$socketState.socket) {
+      return;
     }
     sendScaleproportianallyEventToSite(!!value);
   });
@@ -134,7 +134,6 @@
     siteUrl = new URL(urlParams.get("siteurl") ?? "about:blank");
     siteUrl.searchParams.set("socketChannelId", $socketState.socketChannelId);
   }
-
 </script>
 
 <editor-switch></editor-switch>

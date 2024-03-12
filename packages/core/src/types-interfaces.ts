@@ -140,6 +140,8 @@ export interface IAnimationData {
 }
 export interface IOptions {
   url?: string;
+  animationData?: IAnimationData | unknown;
+  wrapper?: HTMLElement;
   bustCache?: boolean;
   useEditor?: boolean;
 }
