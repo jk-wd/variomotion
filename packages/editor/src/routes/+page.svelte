@@ -15,7 +15,7 @@
   import { animationData } from "../stores/animation-data-store";
   import type { IAnimationData } from "@variomotion/core";
   import {
-    selectedBreakpoint,
+    activeBreakpoint,
     activePopup,
     pixelTimelineMode,
     selectedFrame,
@@ -43,7 +43,7 @@
   let sendAnimationDataLocked = false;
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
-
+    console.log(window.location.search);
     const socketPort = urlParams.get("socketport");
     if (!socketPort) {
       throw new Error("socketPort is not defined");
@@ -89,9 +89,8 @@
     sendFrameSelectedEventToSite({
       pixelBased: $pixelTimelineMode,
       ...$selectedFrame,
-      animationData: $animationData,
       transformMode: mode,
-      breakpoint: $selectedBreakpoint ? $selectedBreakpoint.id : "none",
+      breakpoint: $activeBreakpoint ? $activeBreakpoint : "none",
     });
   });
 
@@ -103,12 +102,25 @@
       sendFrameSelectedEventToSite({
         pixelBased: $pixelTimelineMode,
         ...frame,
-        animationData: $animationData,
         transformMode: $transformMode,
-        breakpoint: $selectedBreakpoint ? $selectedBreakpoint : "none",
+        breakpoint: $activeBreakpoint ? $activeBreakpoint : "none",
       });
     } else {
       sendFrameDeSelectedEventToSite(null);
+    }
+  });
+
+  activeBreakpoint.subscribe((breakpoint) => {
+    if (!$socketState.socket) {
+      return;
+    }
+    if ($selectedFrame) {
+      sendFrameSelectedEventToSite({
+        pixelBased: $pixelTimelineMode,
+        ...$selectedFrame,
+        transformMode: $transformMode,
+        breakpoint: breakpoint ? breakpoint : "none",
+      });
     }
   });
 
@@ -193,7 +205,7 @@
 <style>
   .controls-area {
     position: fixed;
-    margin: 10px 10px 20px 10px;
+    margin: 6px;
   }
   .top {
     position: fixed;
@@ -201,17 +213,17 @@
     left: 0;
   }
   .controls-area.right-bottom {
-    margin: 10px 20px 20px 10px;
+    margin: 6px 20px 6px 6px;
   }
   .right-bottom {
     position: fixed;
-    bottom: 20vh;
+    bottom: 22vh;
     right: 0;
   }
 
   .left-bottom {
     position: fixed;
-    bottom: 20vh;
+    bottom: 22vh;
     left: 0;
   }
 

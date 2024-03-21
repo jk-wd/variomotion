@@ -47,10 +47,15 @@ export const sendAnimationDataToSite = (animationData: IAnimationData) => {
   sendEditorEvent("send-animation-data-to-site", animationData);
 };
 
-export const pauseTimeline = (timelineId: string, position?: number) => {
+export const pauseTimeline = (
+  timelineId: string,
+  position?: number,
+  scrollTo?: boolean
+) => {
   sendEditorEvent("pause-timeline", {
     timelineId,
     position,
+    scrollTo,
   });
 };
 

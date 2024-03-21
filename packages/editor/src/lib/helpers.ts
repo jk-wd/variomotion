@@ -6,6 +6,13 @@ export function getTimelines(timelines: ITimeline[], pixelBased = false) {
   return timelines.filter((timeline) => !!timeline.pixelBased === pixelBased);
 }
 
+export function getQueryParam(id: string) {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+  return new URLSearchParams(window.location.search).get(id);
+}
+
 export async function setUrlRequestParam(id: string, value: string, url: URL) {
   let query = new URLSearchParams(url.searchParams.toString());
   query.set(id, value);

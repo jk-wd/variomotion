@@ -19,7 +19,7 @@
     left: 50%;
     transform: translate(-50%, 0);
     position: absolute;
-    height: 80vh;
+    height: 78vh;
     width: 100%;
   }
 </style>

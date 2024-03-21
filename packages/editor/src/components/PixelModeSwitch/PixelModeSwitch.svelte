@@ -9,17 +9,13 @@
   import { writable } from "svelte/store";
 
   const checked = writable(false);
-  page.subscribe((page) => {
-    $pixelTimelineMode =
-      page.url.searchParams.get("pixelmode") === "true" ? true : false;
-  });
 
   onchange = async (event) => {
     if (!event.detail) {
       return;
     }
     $pixelTimelineMode = event.detail.checked;
-    $selectedTimelineId = undefined;
+    $selectedTimelineId = "";
     if ($pixelTimelineMode === true) {
       await setUrlRequestParam("pixelmode", "true", $page.url);
     } else {

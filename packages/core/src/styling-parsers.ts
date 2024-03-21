@@ -46,6 +46,15 @@ export const domStylingParser = (element: IElement) => {
     );
   }
 
+  if (stylingValues.borderRadius) {
+    console.log("-->", stylingValues.borderRadius);
+    applyStyling(
+      element.domElements,
+      "borderRadius",
+      `${stylingValues.borderRadius.valueString}`
+    );
+  }
+
   if (
     stylingValues.opacity?.valueNumber &&
     stylingValues.opacity.valueNumber <= 0

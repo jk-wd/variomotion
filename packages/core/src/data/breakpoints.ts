@@ -1,6 +1,5 @@
 import {
   IAnimationData,
-  IActiveBreakpoint,
   IBreakpoint,
   NoBreakpointIdentifier,
 } from "../types-interfaces";
@@ -13,9 +12,9 @@ export const setMatchMedia = (matchMediaParam: any) => {
 };
 export const getActiveBreakPoint = (
   animationData?: IAnimationData
-): IActiveBreakpoint => {
+): IBreakpoint => {
   const matchMedia = matchMediaManual ? matchMediaManual : window.matchMedia;
-  let result: IActiveBreakpoint = {
+  let result: IBreakpoint = {
     id: NoBreakpointIdentifier,
   };
   if (!animationData || !animationData.breakpoints) {
@@ -23,10 +22,7 @@ export const getActiveBreakPoint = (
   }
   for (const breakpointDefinition of animationData.breakpoints) {
     if (matchMedia(breakpointDefinition.definition).matches) {
-      result = {
-        id: breakpointDefinition.id,
-        breakpoint: breakpointDefinition,
-      };
+      result = breakpointDefinition;
       break;
     }
   }

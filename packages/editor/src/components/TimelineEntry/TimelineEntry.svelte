@@ -26,7 +26,7 @@
   <div class="entry-name">
     <span>
       {#each getBreakpoints(entry) as breakpoint}
-        <BreakpointDot breakpointColor={breakpoint.color} />
+        <BreakpointDot breakpointColor={breakpoint?.color} />
       {/each}
       {entry.name}
     </span>
@@ -72,7 +72,7 @@
   .entry {
     display: flex;
     flex-direction: row;
-    height: 28px;
+    height: 22px;
   }
 
   .entry-icon-button {
@@ -85,6 +85,7 @@
     width: 144px;
     border-radius: 5px;
     padding: 1px 4px 4px 4px;
+    text-wrap: nowrap;
   }
   .entry-name {
     position: relative;

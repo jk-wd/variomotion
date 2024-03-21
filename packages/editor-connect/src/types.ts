@@ -29,6 +29,7 @@ export interface SocketEventSite extends SocketEvent {
 export type PlayPauseEventData = {
   timelineId: string;
   position?: number;
+  scrollTo?: boolean;
 };
 
 export interface FrameEventData {
@@ -36,7 +37,6 @@ export interface FrameEventData {
   timelineId: string;
   entryId: string;
   index: number;
-  animationData: IAnimationData;
   transformMode: Mode;
   breakpoint: string;
 }

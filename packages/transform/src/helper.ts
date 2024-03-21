@@ -71,7 +71,7 @@ export function positionDomElement(
   opacity?: boolean
 ) {
   target.style.transformOrigin = `${origin.x}px ${origin.y}px`;
-  if (opacity) target.style.opacity = "0.1";
+  if (opacity) target.style.opacity = "0.05";
   target.style.transform = `translate3d(${transformRect.position.x}px, ${transformRect.position.y}px, 0px) rotate(${transformRect.rotate}rad) scale3d(${transformRect.scale.x}, ${transformRect.scale.y}, 1) `;
 }
 

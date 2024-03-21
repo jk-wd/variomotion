@@ -25,7 +25,7 @@
 
   let playing: boolean | undefined = false;
   let progress: number = 0;
-  let breakpoints: IBreakpoint = [];
+
   timelineStates.subscribe((timelineStatesStore) => {
     const timelineState = getTimelineState(
       timelineStatesStore,
@@ -36,7 +36,7 @@
       return;
     }
 
-    playing = timelineState.isRunning;
+    playing = !timelineState.pause;
     progress = timelineState.progress ?? 0;
   });
 
@@ -61,13 +61,13 @@
 
   {#each getBreakpoints(timeline) as breakpoint}
     &nbsp;
-    <BreakpointDot breakpointColor={breakpoint.color} />
+    <BreakpointDot breakpointColor={breakpoint?.color} />
   {/each}
 
   <button
     class="icon-button"
     on:click={async () => {
-      await setUrlRequestParam("timelineidedit", timeline.id, $page.url);
+      await setUrlRequestParam("edittimelineid", timeline.id, $page.url);
       $activePopup = "edit-timeline";
     }}
   >
@@ -127,55 +127,57 @@
 
   <div class="content-right">
     <div class="progress">{Math.round(progress)} {getProgressUnit()}</div>
-    {#if playing}
+    {#if !$pixelTimelineMode}
+      {#if playing}
+        <button
+          class="pause-button control-button"
+          on:click={async () => {
+            $selectedFrame = null;
+            pauseTimeline(timeline.id);
+          }}
+        >
+          <span>pause</span>
+          <Icon
+            style="width: 24px; height: 24px; float: right;"
+            icon="material-symbols-light:pause-circle-outline"
+          />
+        </button>
+      {:else}
+        <button
+          class="play-button control-button"
+          on:click={async () => {
+            $selectedFrame = null;
+            playTimeline(timeline.id);
+          }}
+        >
+          <span>play</span>
+          <Icon
+            style="width: 24px; height: 24px; float: right;"
+            icon="material-symbols-light:play-arrow-outline-rounded"
+          />
+        </button>
+      {/if}
       <button
-        class="pause-button control-button"
+        class="restart-button control-button"
         on:click={async () => {
           $selectedFrame = null;
-          pauseTimeline(timeline.id);
+          $transformMode = "off";
+          playTimeline(timeline.id, 0);
         }}
       >
-        <span>pause</span>
+        <span>restart</span>
         <Icon
           style="width: 24px; height: 24px; float: right;"
-          icon="material-symbols-light:pause-circle-outline"
-        />
-      </button>
-    {:else}
-      <button
-        class="play-button control-button"
-        on:click={async () => {
-          $selectedFrame = null;
-          playTimeline(timeline.id);
-        }}
-      >
-        <span>play</span>
-        <Icon
-          style="width: 24px; height: 24px; float: right;"
-          icon="material-symbols-light:play-arrow-outline-rounded"
+          icon="material-symbols-light:restart-alt"
         />
       </button>
     {/if}
-    <button
-      class="restart-button control-button"
-      on:click={async () => {
-        $selectedFrame = null;
-        $transformMode = "off";
-        playTimeline(timeline.id, 0);
-      }}
-    >
-      <span>restart</span>
-      <Icon
-        style="width: 24px; height: 24px; float: right;"
-        icon="material-symbols-light:restart-alt"
-      />
-    </button>
   </div>
   <div class="add-entry">
     <Button
       variant="tiny"
       on:click={async () => {
-        await setUrlRequestParam("timelineidedit", timeline.id, $page.url);
+        await setUrlRequestParam("edittimelineid", timeline.id, $page.url);
         $activePopup = "add-animation-entry";
       }}>Add enimation entry</Button
     >
@@ -184,7 +186,7 @@
     <Button
       variant="tiny"
       on:click={async () => {
-        await setUrlRequestParam("timelineidedit", timeline.id, $page.url);
+        await setUrlRequestParam("edittimelineid", timeline.id, $page.url);
         $activePopup = "add-sequence-entry";
       }}>Add sequence entry</Button
     >
@@ -194,18 +196,18 @@
 <style>
   .add-entry {
     margin-left: 5px;
-    position: relative;
-    top: -2px;
   }
   .progress {
     font-size: 12px;
     font-family: "ProximaNova-Regular";
-    margin: 4px 10px 0 0;
+    margin: 6px 10px 0 0;
     float: left;
   }
   .control-button > span {
     padding-right: 1px;
     font-size: 14px;
+    position: relative;
+    top: 3px;
     font-family: "ProximaNova-Regular";
   }
   .control-button {
@@ -222,6 +224,7 @@
   }
   .icon-button > span {
     font-size: 12px;
+    padding-top: 2px;
   }
   .title {
     font-size: 14px;
@@ -229,14 +232,14 @@
   }
   .timeline-top {
     font-size: 16px;
-
     top: 0;
     left: 0;
-    padding: 6px 10px;
+    padding: 4px 10px;
     background-color: var(--color-grey-1);
+    border-bottom: 1px solid var(--color-grey-2);
+    border-top: 1px solid var(--color-grey-2);
     width: 100%;
     display: flex;
-
     align-items: center;
   }
   .icon-button-zoom {

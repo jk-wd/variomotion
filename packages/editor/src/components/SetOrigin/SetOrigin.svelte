@@ -108,7 +108,7 @@
       class={`origin-button ${
         isSetOriginButtonSelected(
           dimensions.width / 2,
-          dimensions.width,
+          dimensions.height,
           origin
         )
           ? "selected"
@@ -124,14 +124,14 @@
       class={`origin-button ${
         isSetOriginButtonSelected(
           dimensions.width / 2,
-          dimensions.width / 2,
+          dimensions.height / 2,
           origin
         )
           ? "selected"
           : ""
       }`}
       on:click={() => {
-        origin = { x: dimensions.width / 2, y: dimensions.width / 2 };
+        origin = { x: dimensions.width / 2, y: dimensions.height / 2 };
         originChanged();
       }}
       style="position: absolute; bottom: 34px; left: 34px"

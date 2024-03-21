@@ -5,13 +5,15 @@
     easingFunctions,
     fixedValueMap,
     type IFrameDef,
+    type IBreakpoint,
     type Units,
     deleteFrame,
     FixedValuePropTypes,
     NumberValuePropTypes,
     editEntry,
-    getEntryById,
+    getBreakpointById,
     getAnimationEntryById,
+    NoBreakpointIdentifier,
   } from "@variomotion/core";
   import Box from "../Box/Box.svelte";
 
@@ -19,7 +21,7 @@
     activePopup,
     selectedFrame,
     transformMode,
-    selectedBreakpoint,
+    activeBreakpoint,
   } from "../../stores/ui-state-store";
 
   import { animationData } from "../../stores/animation-data-store";
@@ -37,12 +39,14 @@
   import FrameEditNumberField from "../FrameEditField/FrameEditNumberField.svelte";
   import FrameEditSelectField from "../FrameEditField/FrameEditSelectField.svelte";
   import BoxBottom from "../Box/BoxBottom.svelte";
+  import BreakpointDot from "../BreakpointDot/BreakpointDot.svelte";
   import Select from "../Select/Select.svelte";
   import SetOrigin from "../SetOrigin/SetOrigin.svelte";
-  import { fieldValues } from "../../stores/field-values";
+  import { fieldValues, type FieldValues } from "../../stores/field-values";
   import { dimensions } from "../../stores/dimensions";
   import SelectTransformAxis from "../SelectPointBoolean/SelectPointBoolean.svelte";
   import SelectPointBoolean from "../SelectPointBoolean/SelectPointBoolean.svelte";
+
   import {
     scaleProportianally,
     translateBoolean,
@@ -78,14 +82,17 @@
     }
   });
 
-  function handleFormSubmit() {
-    if (!frame || !$fieldValues || !$animationData || !$selectedFrame) {
+  function handleFormSubmit(fieldValues?: FieldValues) {
+    if (!frame || !fieldValues || !$animationData || !$selectedFrame) {
       return;
     }
-
+    console.log({
+      ...frame,
+      valueDef: fieldValuesToValueDef(fieldValues),
+    });
     const newFrame = {
       ...frame,
-      valueDef: fieldValuesToValueDef($fieldValues),
+      valueDef: fieldValuesToValueDef(fieldValues),
     };
     $animationData = editFrame(
       $animationData,
@@ -159,6 +166,12 @@
   }
 
   let settingOrigin = false;
+
+  let breakpoint: IBreakpoint | undefined = undefined;
+
+  activeBreakpoint.subscribe((activeBreakpoint) => {
+    breakpoint = getBreakpointById($animationData, activeBreakpoint);
+  });
 </script>
 
 {#if $selectedFrame}
@@ -175,15 +188,6 @@
         <span>
           {frame?.frameUnit}
         </span>
-      </div>
-      <div class="breakpoint-select-wrapper">
-        <span>bp:</span>
-        <Select name="breakpoint" bind:value={$selectedBreakpoint}>
-          <option value={"none"}>none</option>
-          {#each $animationData.breakpoints ?? [] as breakpoint}
-            <option value={breakpoint.id}>{breakpoint.id}</option>
-          {/each}
-        </Select>
       </div>
       <div class="right">
         <BoxContent>
@@ -217,43 +221,97 @@
           <form class="" on:submit|preventDefault={handleFormSubmit}>
             <div class="properties">
               {#each Object.keys($fieldValues) as type}
-                {#if Object.keys(NumberValuePropTypes).includes(type)}
-                  <BoxContent>
-                    <FrameEditNumberField
-                      {type}
-                      breakpoint={$selectedBreakpoint}
-                      value={$fieldValues[type][$selectedBreakpoint]?.value}
-                      unit={$fieldValues[type][$selectedBreakpoint]?.unit}
-                      easing={$fieldValues[type][$selectedBreakpoint]?.easing}
-                      on:newvalue={(event) => {
-                        const { value, unit, easing, breakpoint } =
-                          event.detail;
-                        $fieldValues[type][breakpoint] = {
-                          value,
-                          unit,
-                          easing,
-                        };
-                        handleFormSubmit();
-                      }}
-                    />
-                  </BoxContent>
-                {/if}
-                {#if Object.keys(FixedValuePropTypes).includes(type)}
-                  <BoxContent>
-                    <FrameEditSelectField
-                      {type}
-                      fixedValues={getFixedValues(type)}
-                      on:newvalue={(event) => {
-                        const { value } = event.detail;
-                        $fieldValues[type][$selectedBreakpoint] = {
-                          value,
-                        };
+                <div class="property">
+                  {#if Object.keys(NumberValuePropTypes).includes(type)}
+                    <BoxContent>
+                      <div class="value-wrapper">
+                        <FrameEditNumberField
+                          label={type}
+                          {type}
+                          value={$fieldValues[type][NoBreakpointIdentifier]
+                            ?.value}
+                          unit={$fieldValues[type][NoBreakpointIdentifier]
+                            ?.unit}
+                          easing={$fieldValues[type][NoBreakpointIdentifier]
+                            ?.easing}
+                          on:newvalue={(event) => {
+                            const { value, unit, easing } = event.detail;
 
-                        handleFormSubmit();
-                      }}
-                    />
-                  </BoxContent>
-                {/if}
+                            $fieldValues[type][NoBreakpointIdentifier] = {
+                              value,
+                              unit,
+                              easing,
+                            };
+                            handleFormSubmit($fieldValues);
+                          }}
+                        />
+                      </div>
+                      {#if $activeBreakpoint && $activeBreakpoint !== NoBreakpointIdentifier}
+                        <div
+                          class="value-wrapper"
+                          style={`border-left: 4px solid ${breakpoint?.color ?? ""}`}
+                        >
+                          <FrameEditNumberField
+                            {type}
+                            value={$fieldValues[type][$activeBreakpoint]?.value}
+                            unit={$fieldValues[type][$activeBreakpoint]?.unit}
+                            easing={$fieldValues[type][$activeBreakpoint]
+                              ?.easing}
+                            on:newvalue={(event) => {
+                              const { value, unit, easing } = event.detail;
+
+                              $fieldValues[type][$activeBreakpoint] = {
+                                value,
+                                unit,
+                                easing,
+                              };
+                              handleFormSubmit($fieldValues);
+                            }}
+                          />
+                        </div>
+                      {/if}
+                    </BoxContent>
+                  {/if}
+                  {#if Object.keys(FixedValuePropTypes).includes(type)}
+                    <BoxContent>
+                      <div class="value-wrapper">
+                        <FrameEditSelectField
+                          label={type}
+                          value={$fieldValues[type][NoBreakpointIdentifier]
+                            ?.value}
+                          fixedValues={getFixedValues(type)}
+                          on:newvalue={(event) => {
+                            const { value } = event.detail;
+                            $fieldValues[type][NoBreakpointIdentifier] = {
+                              value,
+                            };
+
+                            handleFormSubmit($fieldValues);
+                          }}
+                        />
+                      </div>
+                      {#if $activeBreakpoint && $activeBreakpoint !== NoBreakpointIdentifier}
+                        <div
+                          class="value-wrapper"
+                          style={`border-left: 4px solid ${breakpoint?.color ?? ""}`}
+                        >
+                          <FrameEditSelectField
+                            value={$fieldValues[type][$activeBreakpoint]?.value}
+                            fixedValues={getFixedValues(type)}
+                            on:newvalue={(event) => {
+                              const { value } = event.detail;
+                              $fieldValues[type][$activeBreakpoint] = {
+                                value,
+                              };
+
+                              handleFormSubmit($fieldValues);
+                            }}
+                          />
+                        </div>
+                      {/if}
+                    </BoxContent>
+                  {/if}
+                </div>
               {/each}
             </div>
           </form>
@@ -363,6 +421,13 @@
 {/if}
 
 <style>
+  .value-wrapper {
+    border-left: 4px solid var(--color-grey-1);
+    padding-left: 4px;
+  }
+  .property {
+    margin-bottom: 8px;
+  }
   .bottom-card {
     width: 100%;
     display: flex;
@@ -375,6 +440,7 @@
     width: 100%;
     display: flex;
     gap: 12px;
+    height: 14px;
   }
   .scale-proportianally input {
     position: relative;
@@ -427,7 +493,7 @@
   }
   .transform-button > span {
     font-size: 12px;
-    padding-top: 3px;
+    padding-top: 4px;
   }
   .transform-button-origin {
     background-color: var(--color-grey-2);
@@ -444,10 +510,10 @@
   }
   .transform-button-origin > span {
     position: relative;
-    top: -6px;
+    top: -5px;
   }
   .transform-button-origin > .icon {
     position: relative;
-    top: -9px;
+    top: -10px;
   }
 </style>

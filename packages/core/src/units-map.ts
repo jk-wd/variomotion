@@ -41,6 +41,7 @@ export const unitMap = {
     Units.vh,
     Units.vw,
   ],
+  [NumberValuePropTypes.borderRadius]: [Units.px, Units.percent],
 };
 
 export const fixedValueMap = {

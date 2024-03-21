@@ -15,6 +15,7 @@ export enum NumberValuePropTypes {
   scaleY = "scaleY",
   opacity = "opacity",
   rotate = "rotate",
+  borderRadius = "borderRadius",
 }
 
 export enum FixedValuePropTypes {
@@ -98,15 +99,10 @@ export interface ISequenceEntry extends IEntry {
   sequenceCount: number;
 }
 
-export interface IActiveBreakpoint {
-  id: string;
-  breakpoint?: IBreakpoint;
-}
-
 export interface IBreakpoint {
   id: string;
-  definition: string;
-  color: string;
+  definition?: string;
+  color?: string;
 }
 
 export interface ITimelineStateBase {
@@ -116,9 +112,9 @@ export interface ITimelineStateBase {
 }
 export interface ITimelineState extends ITimelineStateBase {
   id: string;
-  isRunning?: boolean;
   pause?: boolean;
   pauseTime?: number;
+  autoplayed?: boolean;
 }
 export interface IPixelTimelineState extends ITimelineStateBase {
   id: string;

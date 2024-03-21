@@ -65,7 +65,6 @@ export function constructFieldValues(
     ),
     "none",
   ];
-
   const keys = [
     ...(Object.keys(NumberValuePropTypes) ?? []),
     ...(Object.keys(FixedValuePropTypes) ?? []),

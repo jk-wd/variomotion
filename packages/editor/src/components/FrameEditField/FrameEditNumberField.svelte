@@ -11,14 +11,15 @@
 
   const dispatch = createEventDispatcher();
   export let type: NumberValuePropTypes;
-  export let breakpoint: string = "none";
+  export let label: string;
   export let easing: keyof typeof easingFunctions | undefined = undefined;
 
   export let value: number | string | undefined = undefined;
   export let unit: Units | undefined = undefined;
 
   const handleInputChange = () => {
-    if (!unit || (!value && value !== 0)) {
+    console.log("unit", unit);
+    if (!unit) {
       return;
     }
 
@@ -26,12 +27,13 @@
       value,
       unit,
       easing,
-      breakpoint,
     });
   };
 </script>
 
-<label class="label" for={type}>{type}</label>
+{#if label}
+  <label class="label" for={type}>{type}</label>
+{/if}
 <div class="fields">
   {#if type && unitMap[type]}
     <NumberInput

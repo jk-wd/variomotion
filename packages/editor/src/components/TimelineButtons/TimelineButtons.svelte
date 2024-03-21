@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "../Button/Button.svelte";
   import { activePopup } from "../../stores/ui-state-store";
-  import TimelineFilter from "../SelectTimeline/SelectTimeline.svelte";
+  import SelectTimeline from "../SelectTimeline/SelectTimeline.svelte";
   import Box from "../Box/Box.svelte";
   import BoxContent from "../Box/BoxContent.svelte";
   import PixelModeSwitch from "../PixelModeSwitch/PixelModeSwitch.svelte";
@@ -14,7 +14,7 @@
     </BoxContent>
   </div>
   <div class="filters">
-    <TimelineFilter />
+    <SelectTimeline />
   </div>
   <BoxContent>
     <Button

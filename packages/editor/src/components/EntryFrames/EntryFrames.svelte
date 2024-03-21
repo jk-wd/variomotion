@@ -7,17 +7,15 @@
   } from "@variomotion/core";
   import { animationData } from "../../stores/animation-data-store";
   import {
-    activeBreakpoint,
     pixelTimelineMode,
     selectedFrame,
     transformMode,
+    timelineValuePerPixel,
   } from "../../stores/ui-state-store";
 
   import Frames from "../Frames/Frames.svelte";
 
-  import { timelineStates } from "../../stores/timeline-states";
   import { pauseTimeline } from "@variomotion/editor-connect";
-  import { getTimelineState } from "$lib/helpers";
 
   export let entry: IAnimationEntry;
   export let timelineId: string = "";
@@ -27,24 +25,7 @@
     return entry.frames.map((frame: IFrameDef) => frame.framePositionValue);
   }
 
-  let progress = 0;
-
-  let valuePerPixel = 50;
-  let paused: boolean | undefined = false;
   let entryTimeline: HTMLButtonElement | null = null;
-  timelineStates.subscribe((timelineStatesStore) => {
-    const timelineState = getTimelineState(
-      timelineStatesStore,
-      timelineId,
-      $pixelTimelineMode
-    );
-    if (!timelineState) {
-      return;
-    }
-    progress = timelineState.progress ?? 0;
-
-    paused = timelineState.pause;
-  });
 
   function onMouseMoveTimeline(event: any) {
     if (!entryTimeline || $selectedFrame) {
@@ -55,7 +36,7 @@
       0
     );
 
-    progress = relativeMousePos * valuePerPixel;
+    const progress = relativeMousePos * $timelineValuePerPixel;
     pauseTimeline(timelineId, progress);
   }
 </script>
@@ -72,7 +53,6 @@
     on:click={onMouseMoveTimeline}
   >
     <Frames
-      {progress}
       selectedFrame={$selectedFrame?.entryId === entry.id
         ? $selectedFrame?.index
         : undefined}
@@ -98,7 +78,6 @@
           timelineId,
           entry.frames[event.detail].framePositionValue
         );
-        $transformMode = "translate";
         $selectedFrame = {
           timelineId,
           entryId: entry.id,
@@ -127,7 +106,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    height: 28px;
+    height: 22px;
     padding-left: 3px;
   }
   .inactive {

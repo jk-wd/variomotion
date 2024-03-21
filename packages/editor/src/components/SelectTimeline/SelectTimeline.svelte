@@ -10,10 +10,6 @@
   import { page } from "$app/stores";
 
   let placeholderTextTimeline = "Timeline";
-
-  page.subscribe((page) => {
-    $selectedTimelineId = page.url.searchParams.get("timelineid") ?? "";
-  });
 </script>
 
 <Select

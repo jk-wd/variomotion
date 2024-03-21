@@ -9,4 +9,5 @@ export const willChangeMap = {
   [NumberValuePropTypes.opacity]: "opacity",
   [NumberValuePropTypes.width]: undefined,
   [NumberValuePropTypes.height]: undefined,
+  [NumberValuePropTypes.borderRadius]: undefined,
 };

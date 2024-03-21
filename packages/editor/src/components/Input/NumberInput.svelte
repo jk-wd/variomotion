@@ -13,12 +13,13 @@
     let valueString = event.target.value;
     if (isNumeric(valueString)) {
       value = parseFloat(valueString);
-      dispatch("input", { value });
+      
     }
 
     if (valueString === "") {
       value = undefined;
     }
+    dispatch("input", { value });
   };
 </script>
 

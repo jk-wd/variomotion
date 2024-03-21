@@ -1,13 +1,10 @@
 <script lang="ts">
   import {
     getAnimationEntriesForTimeline,
-    getAnimationEntryById,
     getSequenceEntriesForTimeline,
     getTimelineById,
-    getSequenceEntryById,
     isSequenceEntry,
     type IAnimationData,
-    type ISequenceEntry,
     type IEntry,
     type ITimeline,
     type IActiveBreakpoint,
@@ -18,7 +15,6 @@
     pixelTimelineMode,
     activeBreakpoint,
   } from "../../stores/ui-state-store";
-  import { getTimelines } from "$lib/helpers";
 
   import TimelineTop from "../TimelineTop/TimelineTop.svelte";
   import TimelineEntry from "../TimelineEntry/TimelineEntry.svelte";
@@ -26,7 +22,6 @@
 
   import SequenceFrames from "../SequenceFrames/SequenceFrames.svelte";
   import { derived } from "svelte/store";
-  import Frames from "../Frames/Frames.svelte";
   import FrameNumbers from "../FrameNumbers/FrameNumbers.svelte";
 
   let timeline: ITimeline | undefined = undefined;
@@ -48,21 +43,6 @@
     }
   });
 
-  function getTimelinesLocal(
-    animationData: IAnimationData,
-    selectedTimelineId?: string,
-    pixelTimelineMode?: boolean
-  ) {
-    if (selectedTimelineId) {
-      const timeline = getTimelineById(animationData, selectedTimelineId);
-      if (!timeline) {
-        return [];
-      }
-      return [timeline];
-    }
-    return getTimelines(animationData?.timelines ?? [], pixelTimelineMode);
-  }
-
   function getEntriesLocal(
     timelineId: string,
     animationData: IAnimationData
@@ -76,7 +56,6 @@
       timelineId
     );
     const entries = [...(animationEntries ?? []), ...(sequenceEntries ?? [])];
-
     return entries ?? [];
   }
 
@@ -111,7 +90,7 @@
             {/each}
           </div>
           <div class="frame-numbers">
-            <FrameNumbers />
+            <FrameNumbers timelineId={timeline.id} />
           </div>
           <div class="frames">
             {#each getEntriesLocal(timeline.id, $animationData) as entry, index}
@@ -140,7 +119,6 @@
     z-index: 12;
   }
   .frame-numbers {
-    z-index: 11;
     position: absolute;
     left: 203px;
   }
@@ -149,11 +127,10 @@
     position: absolute;
     bottom: 0;
     width: 100vw;
-    height: 20vh;
+    height: 22vh;
     display: flex;
     flex-direction: column;
-    background-color: var(--color-white);
-    border-top: 1px solid var(--color-grey-2);
+    background-color: var(--color-grey-2);
   }
 
   .animation-entries {
@@ -161,16 +138,18 @@
   }
   .animation-entries .names {
     width: 200px;
-    padding-top: 20px;
+    padding-top: 24px;
   }
   .animation-entries .frames {
     width: 100%;
     overflow: hidden;
     padding-bottom: 10px;
-    padding-top: 20px;
+    padding-top: 24px;
   }
 
   .timeline-items {
     overflow: auto;
+    background-color: var(--color-white);
+    min-height: 22vh;
   }
 </style>

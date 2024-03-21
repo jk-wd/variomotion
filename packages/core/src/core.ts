@@ -1,6 +1,6 @@
 import parserMap from "./value-parsers";
 
-import { calculatePageScroll } from "./utils";
+import { calculatePageScroll, numberIsSet } from "./utils";
 import { domStylingParser } from "./styling-parsers";
 import { willChangeMap } from "./will-change-map";
 import { getActiveBreakPoint } from "./data/breakpoints";
@@ -81,12 +81,10 @@ const updateTimelines = (timestamp: number) => {
           id: timeline.id,
         };
     const timelineState = timelineStates[timeline.id];
-    if (
-      timelineState.isRunning &&
-      !timelineState.pause &&
-      timelineState.duration
-    ) {
-      if (!timelineState.start) timelineState.start = timestamp;
+    if (!timelineState.pause && timelineState.duration) {
+      if (!timelineState.start) {
+        timelineState.start = timestamp;
+      }
       const pauseTime = timelineState.pauseTime ? timelineState.pauseTime : 0;
       const progress = timestamp - timelineState.start - pauseTime;
 
@@ -94,19 +92,17 @@ const updateTimelines = (timestamp: number) => {
         timelineState.start = timestamp - pauseTime;
         timelineState.progress = timelineState.duration;
         if (!timeline.loop) {
-          timelineState.isRunning = false;
           timelineState.pause = true;
           timelineState.pauseTime = timestamp - timelineState.start - progress;
         }
       } else {
         timelineState.progress = progress;
       }
-    } else if (
-      timelineState.isRunning &&
-      timelineState.pause &&
-      timelineState.progress
-    ) {
-      if (!timelineState.start) timelineState.start = timestamp;
+    } else if (timelineState.pause && timelineState.progress) {
+      if (!timelineState.start) {
+        timelineState.start = timestamp;
+      }
+
       timelineState.pauseTime =
         timestamp - timelineState.start - timelineState.progress;
     }
@@ -323,24 +319,33 @@ const prepareTimelinState = (timelineId: string) => {
           id: timeline.id,
         };
 
-    timelineStates[timeline.id].isRunning = timeline.autoplay;
+    timelineStates[timeline.id].pause = timelineStates[timeline.id].autoplayed
+      ? timelineStates[timeline.id].pause
+      : !timeline.autoplay;
+    timelineStates[timeline.id].autoplayed = true;
   } else {
     if (!pixelTimelineStates[timeline.id]) {
       pixelTimelineStates[timeline.id] = {
         id: timeline.id,
       };
     }
-    pixelTimelineStates[timeline.id].start =
-      timeline.startPixel ?? pixelTimelineStates[timeline.id].start ?? wrapper
-        ? wrapper.getBoundingClientRect().y
-        : 0;
+    if (numberIsSet(timeline.startPixel)) {
+      pixelTimelineStates[timeline.id].start = timeline.startPixel;
+    } else if (
+      !numberIsSet(pixelTimelineStates[timeline.id].start) &&
+      wrapper
+    ) {
+      pixelTimelineStates[timeline.id].start =
+        wrapper.getBoundingClientRect().y;
+    } else {
+      pixelTimelineStates[timeline.id].start = 0;
+    }
   }
   const timelineState = timeline.pixelBased
     ? pixelTimelineStates[timeline.id]
     : timelineStates[timeline.id];
 
   if (timelineState) {
-    
     for (const animation of animations) {
       if (timeline.id !== animation.timelineId) {
         continue;
@@ -351,9 +356,11 @@ const prepareTimelinState = (timelineId: string) => {
         end
       );
       if (timeline.pixelBased) {
-        lastPixel = Math.max(((timelineState.start ?? 0) + timelineState.duration), lastPixel)
+        lastPixel = Math.max(
+          (timelineState.start ?? 0) + timelineState.duration,
+          lastPixel
+        );
       }
-      
     }
     for (const sequenceAnimation of sequenceAnimations) {
       if (timeline.id !== sequenceAnimation.timelineId) {
@@ -363,12 +370,13 @@ const prepareTimelinState = (timelineId: string) => {
       const sequenceEnd = getEndFromSequenceAnimation(sequenceAnimation);
       timelineState.duration = Math.max(sequenceEnd, end);
       if (timeline.pixelBased) {
-        lastPixel = Math.max(((timelineState.start ?? 0) + timelineState.duration), lastPixel)
+        lastPixel = Math.max(
+          (timelineState.start ?? 0) + timelineState.duration,
+          lastPixel
+        );
       }
     }
-    if (
-      lastPixel
-    ) {
+    if (lastPixel) {
       wrapper.style.height = `${lastPixel + wrapperClientHeight}px`;
     }
   }
@@ -556,7 +564,6 @@ export const play = (timelineId?: string, position?: number) => {
 
   if (timeline && timeline.duration) {
     timeline.pause = false;
-    timeline.isRunning = true;
     timeline.progress = startFromPosition ? startPosition : timeline.progress;
     timeline.start = startFromPosition ? 0 : timeline.start;
     timeline.pauseTime = startFromPosition ? 0 : timeline.pauseTime;
@@ -590,17 +597,19 @@ export const getOptions = () => {
 };
 
 export const init = async (optionsParam?: IOptions) => {
-  if(animationData) {
+  if (animationData) {
     processAnimationData();
     return;
   }
-  
+
   wrapper = optionsParam?.wrapper ?? document.body;
-  wrapperClientHeight = optionsParam?.wrapper ? wrapper.clientHeight: window.innerHeight;
+  wrapperClientHeight = window.innerHeight;
   options = {
     ...optionsParam,
   };
-  animationData = options.animationData ? options.animationData as IAnimationData : animationData;
+  animationData = options.animationData
+    ? (options.animationData as IAnimationData)
+    : animationData;
   const animationDataFetch = await fetchAnimationJSON();
   if (animationDataFetch) {
     animationData = animationDataFetch;

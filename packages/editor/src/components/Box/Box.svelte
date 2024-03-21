@@ -57,13 +57,14 @@
 <style>
   .box {
     position: relative;
-    padding: 6px 8px;
+    padding: 4px 8px;
     background-color: var(--color-grey-1);
-    border-radius: 8px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
+    border: 1px solid var(--color-grey-2);
   }
   .box.moving::after {
     content: "";

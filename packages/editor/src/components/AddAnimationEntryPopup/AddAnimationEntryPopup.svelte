@@ -17,7 +17,7 @@
     type IFrameDef,
   } from "@variomotion/core";
 
-  const timelineId = $page.url.searchParams.get("timelineid");
+  const timelineId = $page.url.searchParams.get("edittimelineid");
 
   let name: string | undefined;
   const emptyFrame: IFrameDef = {
@@ -60,7 +60,8 @@
     <label for="domTargets">Add DOM targets</label><br />
     <div class="multi-select">
       <MultiSelect
-        on:blur={() => {
+        on:change={() => {
+          console.log(selectedDomTargets);
           if (name === undefined && selectedDomTargets.length === 1) {
             name = selectedDomTargets[0];
           }

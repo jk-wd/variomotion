@@ -1,4 +1,8 @@
-import { IAnimationData, getFrameById } from "@variomotion/core";
+import {
+  IAnimationData,
+  getFrameById,
+  getTimelineById,
+} from "@variomotion/core";
 import { SocketNotInitializedError } from "./errors";
 import { getDomTargetsSite } from "./helper";
 import { getSocket, setupSocket } from "./socket";
@@ -22,9 +26,8 @@ import {
   getActiveFrame,
   setActiveFrame,
   setDomTargetDimensions,
-  setupTransformCanvas,
+  transformCanvas,
 } from "./transform-canvas";
-
 
 let scrollToInterval: NodeJS.Timeout;
 let socketChannelId: string | undefined;
@@ -49,13 +52,10 @@ export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
 }
 
 export const sendTimelineStatesToEditor = (variomotion: VariomotionLib) => {
-  sendSiteEvent(
-    "send-timeline-states-to-editor",
-    {
-      timelineStates: variomotion.getTimelineStates(),
-      pixelTimelineStates: variomotion.getPixelTimelineStates(),
-    }
-  );
+  sendSiteEvent("send-timeline-states-to-editor", {
+    timelineStates: variomotion.getTimelineStates(),
+    pixelTimelineStates: variomotion.getPixelTimelineStates(),
+  });
 };
 
 export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
@@ -64,7 +64,6 @@ export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
 
 export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
   const animaitonData = variomotion.getAnimationData();
-
   sendSiteEvent("send-animation-data-to-editor", {
     ...variomotion.getAnimationData(),
     metaData: {
@@ -76,44 +75,53 @@ export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
 
 export const connectEditor = async (
   variomotion: VariomotionLib,
-  socketPort: number
+  socketPort: number,
+  initCallback: () => Promise<void>
 ) => {
-  if(connected) {
-    return
+  if (connected) {
+    variomotion.updateAnimationData(variomotion.getAnimationData());
+    return;
   }
   await setupSocket(socketPort);
-  
+  await setDomTargetDimensions();
+  await initCallback();
   const socket = getSocket();
-  
+
   const url = variomotion.getOptions().url;
   const animaitonData = variomotion.getAnimationData();
-  fileName = animaitonData?.metaData?.fileName ? animaitonData?.metaData?.fileName : url?.split("/").pop() ?? "";
+  fileName = animaitonData?.metaData?.fileName
+    ? animaitonData?.metaData?.fileName
+    : url?.split("/").pop() ?? "";
   socketChannelId =
     new URL(window.location.href).searchParams.get("socketChannelId") ??
     undefined;
-
   connectVariomotion(variomotion);
   sendAnimationDataToEditor(variomotion);
-  setDomTargetDimensions();
 
   socket.addEventListener("message", (message) => {
     const event = JSON.parse(message.data) as SocketEvent;
     if (event.type === "send-animation-data-to-site") {
-    
       variomotion.updateAnimationData(event.data as IAnimationData);
       tearDownTransform();
       const activeFrame = getActiveFrame();
       if (activeFrame) {
-        setActiveFrame({
-          ...activeFrame,
-          animationData: event.data as IAnimationData,
-        });
-        setupTransformCanvas(variomotion);
+        transformCanvas(variomotion);
       }
     }
     if (event.type === "pause-timeline") {
       const data = event.data as PlayPauseEventData;
       variomotion.pause(data.timelineId, data.position);
+      const timeline = getTimelineById(
+        variomotion.getAnimationData(),
+        data.timelineId
+      );
+      if (timeline?.pixelBased && data.position && data.scrollTo) {
+        window.scrollTo({
+          top: data.position + (timeline.startPixel ?? 0),
+          left: 0,
+          behavior: "instant",
+        });
+      }
     }
 
     if (event.type === "play-timeline") {
@@ -138,6 +146,7 @@ export const connectEditor = async (
     }
 
     if (event.type === "frameselect") {
+      tearDownTransform();
       clearInterval(scrollToInterval);
       const data = event.data as FrameEventData;
       if (!data) {
@@ -145,7 +154,11 @@ export const connectEditor = async (
         return;
       }
       setActiveFrame(data);
-      const frame = getFrameById(data.animationData, data.entryId, data.index);
+      const frame = getFrameById(
+        variomotion.getAnimationData(),
+        data.entryId,
+        data.index
+      );
 
       const timelineStates = variomotion.getPixelTimelineStates();
       const timelineState = timelineStates[data.timelineId];
@@ -160,14 +173,14 @@ export const connectEditor = async (
           if (frame.framePositionValue + startPx === window.scrollY) {
             setTransformMode(data.transformMode);
 
-            setupTransformCanvas(variomotion);
+            transformCanvas(variomotion);
             clearInterval(scrollToInterval);
           }
         }, 10);
       } else {
         clearInterval(scrollToInterval);
         setTransformMode(data.transformMode);
-        setupTransformCanvas(variomotion);
+        transformCanvas(variomotion);
       }
     }
 
@@ -178,12 +191,11 @@ export const connectEditor = async (
         progress: number;
         timelineId: string;
       };
-
       if (timelineStates[data.timelineId]) {
         timelineStates[data.timelineId].progress = data.progress;
       }
     }
   });
-  connected = true
+  connected = true;
   return variomotion;
 };

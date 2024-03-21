@@ -20,7 +20,7 @@ import {
   TransformState,
   setTransformMode,
   tearDownTransform,
-  transformElementOnAnimationFrame,
+  transformElement,
 } from "@variomotion/transform";
 
 const dimensionStore: Record<string, DomtargetDimensions> = {};
@@ -34,10 +34,17 @@ export function getActiveFrame() {
   return activeFrame;
 }
 
+let setDomTargetDimensionsTimeout: NodeJS.Timeout | undefined = undefined;
 export function setDomTargetDimensions() {
   const domTargets = getDomTargets();
   domTargets.forEach((id) => {
     dimensionStore[id] = getDomTargetDimension(id) ?? dimensionStore[id];
+  });
+  return new Promise<void>((resolve) => {
+    setDomTargetDimensionsTimeout = setTimeout(() => {
+      clearTimeout(setDomTargetDimensionsTimeout);
+      resolve();
+    }, 500);
   });
 }
 
@@ -50,8 +57,9 @@ export function connectVariomotion(variomotion: VariomotionLib) {
 
     const timelineStates = variomotion.getPixelTimelineStates();
     const timelineState = timelineStates[activeFrame.timelineId];
+
     const frame = getFrameById(
-      activeFrame.animationData,
+      variomotion.getAnimationData(),
       activeFrame.entryId,
       activeFrame.index
     );
@@ -62,14 +70,24 @@ export function connectVariomotion(variomotion: VariomotionLib) {
   });
 }
 
+let transformCanvasTimeout: NodeJS.Timeout | undefined;
+export function transformCanvas(variomotion: VariomotionLib) {
+  transformCanvasTimeout = setTimeout(() => {
+    setupTransformCanvas(variomotion);
+    clearTimeout(transformCanvasTimeout);
+  }, 200);
+}
+
 export function setupTransformCanvas(variomotion: VariomotionLib) {
   if (!activeFrame) {
     return;
   }
   const { entryId, index } = activeFrame;
 
-  const animationData = activeFrame.animationData;
-  variomotion.updateAnimationData(animationData);
+  const animationData = variomotion.getAnimationData();
+  if (!animationData) {
+    return;
+  }
 
   const activeBreakpoint = getActiveBreakPoint(animationData)?.id;
   const entry = getAnimationEntryById(animationData, entryId);
@@ -134,48 +152,43 @@ export function setupTransformCanvas(variomotion: VariomotionLib) {
     return;
   }
 
-  transformElementOnAnimationFrame(
-    document.querySelectorAll(match.input)[0] as HTMLElement,
-    {
-      startTransform,
-      origin: entry.transformOrigin ?? { x: 0, y: 0 },
-      startClientRect: dimensions.clientRect,
-      onMouseUp: ({ origin, transformRect }: TransformState) => {
-        let animationDataUpdated = editEntry(animationData, {
-          ...entry,
-          transformOrigin: origin,
-        });
-
-        animationDataUpdated = editFrame(
-          animationDataUpdated,
-          entry.id,
-          {
-            ...frame,
-            valueDef: {
-              ...applyTransformations(
-                {
-                  translateX: transformRect.position.x,
-                  translateY: transformRect.position.y,
-                  scaleX: transformRect.scale.x * 100,
-                  scaleY: transformRect.scale.y * 100,
-                  rotate: transformRect.rotate,
-                },
-                frame.valueDef,
-                activeFrame?.breakpoint
-              ),
-            },
+  transformElement(document.querySelectorAll(match.input)[0] as HTMLElement, {
+    startTransform,
+    origin: entry.transformOrigin ?? { x: 0, y: 0 },
+    startClientRect: dimensions.clientRect,
+    onMouseUp: ({ origin, transformRect }: TransformState) => {
+      let animationDataUpdated = editEntry(animationData, {
+        ...entry,
+        transformOrigin: origin,
+      });
+      animationDataUpdated = editFrame(
+        animationDataUpdated,
+        entry.id,
+        {
+          ...frame,
+          valueDef: {
+            ...applyTransformations(
+              {
+                translateX: transformRect.position.x,
+                translateY: transformRect.position.y,
+                scaleX: transformRect.scale.x * 100,
+                scaleY: transformRect.scale.y * 100,
+                rotate: transformRect.rotate,
+              },
+              frame.valueDef,
+              activeFrame?.breakpoint
+            ),
           },
-          index
-        );
-        variomotion.updateAnimationData(animationDataUpdated);
+        },
+        index
+      );
+      variomotion.updateAnimationData(animationDataUpdated);
 
-        sendAnimationDataToEditor(variomotion);
-        if (activeFrame) {
-          activeFrame.animationData = animationDataUpdated;
-          tearDownTransform();
-          setupTransformCanvas(variomotion);
-        }
-      },
-    }
-  );
+      sendAnimationDataToEditor(variomotion);
+      if (activeFrame) {
+        tearDownTransform();
+        setupTransformCanvas(variomotion);
+      }
+    },
+  });
 }

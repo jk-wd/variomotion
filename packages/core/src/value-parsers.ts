@@ -113,6 +113,7 @@ const parserMap: {
   opacity: parseNumberFrames,
   display: parseStringFrames,
   visibility: parseStringFrames,
+  borderRadius: parseNumberFrames,
 };
 
 export default parserMap;

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { animationData } from "../../stores/animation-data-store";
-  import { activeBreakpoint, activePopup } from "../../stores/ui-state-store";
+  import {
+    activeBreakpoint,
+    activePopup,
+    selectedTimelineId,
+  } from "../../stores/ui-state-store";
   import { viewportState, type ViewportState } from "../../stores/viewport";
   import Box from "../Box/Box.svelte";
   import BoxContent from "../Box/BoxContent.svelte";
@@ -9,14 +13,16 @@
   import variomotion, {
     getActiveBreakPoint,
     setMatchMedia,
+    getBreakpointById,
     type IActiveBreakpoint,
   } from "@variomotion/core";
   import matchMediaMock from "match-media-mock";
   import NumberInput from "../Input/NumberInput.svelte";
   import BreakpointDot from "../BreakpointDot/BreakpointDot.svelte";
+  import { pauseTimeline } from "@variomotion/editor-connect";
 
   animationData.subscribe((data) => {
-    $activeBreakpoint = getActiveBreakPoint(data);
+    $activeBreakpoint = getActiveBreakPoint(data).id;
   });
   const mediaMock = matchMediaMock.create();
   viewportState.subscribe(({ viewportWidth }: ViewportState) => {
@@ -25,7 +31,13 @@
       width: viewportWidth ?? window.innerWidth,
     });
     setMatchMedia(mediaMock);
-    $activeBreakpoint = getActiveBreakPoint($animationData);
+    $activeBreakpoint = getActiveBreakPoint($animationData).id;
+  });
+
+  let breakpoint: IActiveBreakpoint | undefined = undefined;
+
+  activeBreakpoint.subscribe((activeBreakpoint) => {
+    breakpoint = getBreakpointById($animationData, activeBreakpoint);
   });
 </script>
 
@@ -34,9 +46,9 @@
     >Active bp:
 
     <span class="breakpoint-value"
-      >{$activeBreakpoint?.id ?? ""}
-      {#if $activeBreakpoint && $activeBreakpoint.breakpoint}
-        <BreakpointDot breakpointColor={$activeBreakpoint.breakpoint.color} />
+      >{$activeBreakpoint ?? ""}
+      {#if breakpoint}
+        <BreakpointDot breakpointColor={breakpoint.color} />
       {/if}
     </span></span
   >

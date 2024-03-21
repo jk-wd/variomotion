@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { timelineValuePerPixel } from "../../stores/ui-state-store";
+  import Frame from "../Frame/Frame.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -11,53 +12,10 @@
   export let frameColor = `var(--color-blue)`;
 
   export let frames: number[] = [];
-  export let progress: number = 0;
+
   export let selectedFrame: number | undefined = undefined;
   export let hoverFrame: number | undefined = undefined;
 
-  const dragFrame = (index: number) => {
-    let dragPos1 = 0;
-    let dragPos2 = 0;
-
-    let framePositionStart = 0;
-    let frameDragTarget: undefined | HTMLElement = undefined;
-
-    function elementDrag(event: any) {
-      if (!frameDragTarget) {
-        return;
-      }
-      // calculate the new cursor position:
-      dragPos1 = dragPos2 - event.clientX;
-      dragPos2 = event.clientX;
-
-      const newPosition = Math.max(frameDragTarget.offsetLeft - dragPos1, 0);
-      frameDragTarget.style.left = newPosition + "px";
-      if (newPosition !== frames[index]) {
-        frames[index] = newPosition * $timelineValuePerPixel;
-      }
-    }
-
-    function closeDragElement() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
-
-      if (framePositionStart === frames[index]) {
-        selectedFrame = selectedFrame === index ? undefined : index;
-        dispatch("frameselected", selectedFrame);
-      } else {
-        dispatch("frameMoved", { index, value: frames[index] });
-      }
-    }
-
-    return (event: any) => {
-      framePositionStart = frames[index];
-      dragPos2 = event.clientX;
-      document.onmouseup = closeDragElement;
-      document.onmousemove = elementDrag;
-      frameDragTarget = event.target;
-    };
-  };
   let framesLineHtmlelement: HTMLElement | undefined = undefined;
   function addFrameDbClick(event: any) {
     if (!framesLineHtmlelement) {
@@ -70,19 +28,9 @@
         $timelineValuePerPixel
     );
   }
-  function frameSizeStyle(index: number) {
-    if (!frameSizes[index]) {
-      return "";
-    }
-    return `width:${frameSizes[index] / $timelineValuePerPixel + 6}px;`;
-  }
 </script>
 
 <div class="frames" style={`width:${numberOfPixels + 50}px`}>
-  <div
-    class="position"
-    style={`left:${Math.round(progress / $timelineValuePerPixel)}px`}
-  ></div>
   <div
     bind:this={framesLineHtmlelement}
     class="frame-line"
@@ -91,41 +39,27 @@
     on:dblclick={addFrameDbClick}
   >
     {#each frames as frame, i}
-      <button
-        class={`frame ${i === selectedFrame ? "selected" : ""}`}
-        style={`left:${frame / $timelineValuePerPixel}px; ${frameSizeStyle(
-          i
-        )} background-color:${
-          i === selectedFrame
-            ? "orange"
-            : i === hoverFrame
-              ? "var(--color-black)"
-              : frameColor
-        }`}
-        on:mousedown|preventDefault|stopPropagation={dragFrame(i)}
-        on:mouseover={() => {
-          hoverFrame = i;
+      <Frame
+        {frame}
+        selected={selectedFrame === i}
+        frameSize={frameSizes[i]}
+        on:frameselected={() => {
+          dispatch("frameselected", i);
         }}
-        on:mouseout={() => {
-          hoverFrame = undefined;
+        on:frameMoved={(e) => {
+          dispatch("frameMoved", {
+            index: i,
+            value: e.detail,
+          });
         }}
-      ></button>
+      />
     {/each}
   </div>
 </div>
 
 <style>
-  .position {
-    position: absolute;
-    top: 4px;
-    left: 0;
-    width: 1px;
-    height: 22px;
-    background-color: var(--color-grey-4);
-    opacity: 1;
-  }
-
   .frame-line {
+    z-index: 11;
     position: relative;
     width: 100%;
     height: 12px;
@@ -147,18 +81,6 @@
     justify-content: center;
     height: 100%;
     position: relative;
-  }
-  .frame {
-    display: block;
-    position: absolute;
-    top: 3px;
-    width: 8px;
-    height: 8px;
-    transform: translateX(-3px);
-    border-radius: 4px;
-    background-color: var(--color-blue);
-  }
-  .frame.selected {
-    background-color: var(--color-orange);
+    left: -1px;
   }
 </style>

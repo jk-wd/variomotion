@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { FixedValuePropTypes } from "@variomotion/core";
   import { createEventDispatcher } from "svelte";
-  import NumberInput from "../Input/NumberInput.svelte";
   import Select from "../Select/Select.svelte";
 
   const dispatch = createEventDispatcher();
-  export let type: FixedValuePropTypes | undefined;
+  export let label: string | undefined;
   export let value: string | number | undefined;
   export let fixedValues: string[] | number[];
 
@@ -16,7 +14,9 @@
   };
 </script>
 
-<label class="label" for={type}>{type}</label>
+{#if label}
+  <label class="label" for={label}>{label}</label>
+{/if}
 <div class="fields">
   <div class="select-wrapper">
     <Select bind:value on:change={handleInputChange}>

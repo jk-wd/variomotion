@@ -20,7 +20,7 @@
   } from "@variomotion/core";
   import NumberInput from "../Input/NumberInput.svelte";
 
-  const timelineId = $page.url.searchParams.get("timelineidedit");
+  const timelineId = $page.url.searchParams.get("edittimelineid");
   const timeline = timelineId
     ? getTimelineById($animationData, timelineId)
     : undefined;

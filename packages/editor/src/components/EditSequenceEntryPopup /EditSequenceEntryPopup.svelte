@@ -8,39 +8,35 @@
   import Popup from "../Popup/Popup.svelte";
 
   import {
-    addEntry,
-    connectTimelineEntry,
-    uuidv4,
     type ISequenceEntry,
+    type IEntry,
+    editEntry,
   } from "@variomotion/core";
 
-  const timelineId = $page.url.searchParams.get("timelineid");
+  const entryid = $page.url.searchParams.get("entryid");
+  const entry = ($animationData.entries ?? []).find(
+    (entry: IEntry) => entry.id === entryid
+  ) as ISequenceEntry;
 
-  let name: string | undefined;
-  let framePositionValue: number = 0;
-  let interval: number = 1;
-  let sequenceCount: number = 1;
+  let name: string | undefined = entry?.name;
+  let framePositionValue: number = entry?.framePositionValue ?? 0;
+  let interval: number = entry?.interval ?? 1;
+  let sequenceCount: number = entry?.sequenceCount ?? 1;
 
-  let selectedDomTarget: string | undefined = undefined;
+  let selectedDomTarget: string | undefined = entry?.domQuery;
   function handleFormSubmit() {
-    if (!timelineId) {
+    if (!entryid) {
       return;
     }
-    const id = uuidv4();
-    $animationData = addEntry<ISequenceEntry>($animationData ?? {}, {
-      id,
+
+    $animationData = editEntry<ISequenceEntry>($animationData ?? {}, {
+      ...entry,
       domQuery: `[data-v~=\"${selectedDomTarget}\"]`,
       framePositionValue,
       interval,
       sequenceCount,
       name,
     });
-    $animationData = connectTimelineEntry(
-      $animationData,
-      timelineId,
-      id,
-      "sequence"
-    );
     $activePopup = null;
   }
 </script>
@@ -52,7 +48,7 @@
       type="text"
       placeholder="Sequence name"
       name="name"
-      bind:value={name}
+      bind:value={entry.name}
     />
     <label for="framePositionValue">Frame position</label><br />
     <input
@@ -82,7 +78,7 @@
     </select>
 
     <div class="button-container">
-      <Button type="submit">Add sequence entry</Button>
+      <Button type="submit">Edit sequence entry</Button>
     </div>
   </form>
 </Popup>

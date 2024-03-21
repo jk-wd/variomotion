@@ -16,7 +16,7 @@
     type ISequenceEntry,
   } from "@variomotion/core";
 
-  const timelineId = $page.url.searchParams.get("timelineid");
+  const timelineId = $page.url.searchParams.get("edittimelineid");
 
   let name: string | undefined;
   let framePositionValue: number = 0;

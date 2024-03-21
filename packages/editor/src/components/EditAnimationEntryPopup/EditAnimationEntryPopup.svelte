@@ -68,7 +68,7 @@
       <MultiSelect
         placeholder="DOM targets"
         bind:selected={selectedDomTargets}
-        options={$domTargets.sequence}
+        options={$domTargets.regular}
       />
     </div>
     <div class="multi-select">

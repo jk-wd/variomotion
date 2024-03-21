@@ -63,17 +63,6 @@ export function setScaleProportianally(proportianally: boolean) {
   scaleProportianally = proportianally;
 }
 
-export function transformElementOnAnimationFrame(
-  target: HTMLElement | SVGGraphicsElement,
-  optionsParam: TransformOptions
-) {
-  cancelAnimationFrame(animationFrame);
-  animationFrame = requestAnimationFrame(() => {
-    cancelAnimationFrame(animationFrame);
-    transformElement(target, optionsParam);
-  });
-}
-
 function prepareTransformStore(
   target: HTMLElement | SVGGraphicsElement,
   options: TransformOptions
@@ -180,7 +169,7 @@ export function transformElement(
 
   const draw = () => {
     ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
-    if (scrolling || targetMode === "off") {
+    if (scrolling) {
       animationFrame = window.requestAnimationFrame(draw);
       return;
     }
@@ -199,12 +188,13 @@ export function transformElement(
       ctx!.fill();
     }
     ctx!.restore();
-    positionDomElement(
-      target,
-      transformRect,
-      options.origin,
-      target.style.opacity === "0"
-    );
+    if (targetMode !== "off")
+      positionDomElement(
+        target,
+        transformRect,
+        options.origin,
+        target.style.opacity === "0"
+      );
     animationFrame = window.requestAnimationFrame(draw);
   };
 
