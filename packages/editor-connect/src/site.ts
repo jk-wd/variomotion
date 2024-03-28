@@ -79,16 +79,19 @@ export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
 
 export const connectEditor = async (
   variomotion: VariomotionLib,
-  config: {
-    socketPort?: number;
-  },
-  initCallback: () => Promise<void>
+  initCallback: () => Promise<void>,
+  config:
+    | {
+        socketPort?: number;
+        [key: string]: unknown;
+      }
+    | undefined
 ) => {
   if (connected) {
     variomotion.updateAnimationData(variomotion.getAnimationData());
     return;
   }
-  await setupSocket(config.socketPort ?? 8787);
+  await setupSocket(config?.socketPort ?? 8787);
   await setDomTargetDimensions();
   await initCallback();
   const socket = getSocket();

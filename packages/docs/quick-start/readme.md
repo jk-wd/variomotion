@@ -46,8 +46,59 @@ touch ./src/animations/animation.json ; echo "{}" > ./src/animations/animation.j
 
 ## Connect variomotion to you app
 
-Almost there! We can start connecting variomotion to your app. In case of react open the `App.tsx` file
+Almost there! We can start connecting variomotion to your app. In case of react open the `App.tsx` file.
+Add the follwing code snippets:
 
-```bash
-touch ./src/animations/animation.json ; echo "{}" > ./src/animations/animation.json
+### imports
+
+Import the variomotion package, and the animation file.
+
+```javascript
+import variomotion from "@variomotion/core";
+import animationData from "./animations/animation.json";
+```
+
+### Connect variomotion
+
+For react we use the `useEffect` hook to connect Variomotion:
+
+```javascript
+useEffect(() => {
+  async function initVariomotion() {
+    // Connect to the Variomotion Editor in development mode
+    if (process.env.NODE_ENV === "development") {
+      const { connectEditor } = await import("@variomotion/editor-connect");
+      const varioConfig = await import("../vario.config.json");
+
+      // Connect the editor
+      await connectEditor(variomotion, varioConfig, async () => {
+        return variomotion.init({
+          animationData,
+        });
+      });
+    } else {
+      // For production, we dont want to connect to the editor
+      await variomotion.init({
+        animationData,
+      });
+    }
+  }
+  initVariomotion();
+}, []);
+```
+
+### Expose the elements you want to animate
+
+The last step before we can start animating, is expsosing elements for animation using the data-v attribute:
+
+```html
+<img data-v="logo" src="{logo}" className="App-logo" alt="logo" />
+```
+
+### Lets start the editor! :tada:
+
+The last step before we can start animating, is expsosing elements for animation using the data-v attribute:
+
+```html
+<img data-v="logo" src="{logo}" className="App-logo" alt="logo" />
 ```
