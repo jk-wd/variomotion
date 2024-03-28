@@ -95,10 +95,16 @@ The last step before we can start animating, is expsosing elements for animation
 <img data-v="logo" src="{logo}" className="App-logo" alt="logo" />
 ```
 
-### Lets start the editor! :tada:
+## Lets start the editor! :tada:
 
-The last step before we can start animating, is expsosing elements for animation using the data-v attribute:
+Step 1 run your (React) project
 
-```html
-<img data-v="logo" src="{logo}" className="App-logo" alt="logo" />
+```bash
+npm run start
+```
+
+Step 2 start the editor, **_important!: make sure the portnumber matches the port number from step 1._**
+
+```bash
+npx variomotion-editor --url=http://localhost:3000
 ```

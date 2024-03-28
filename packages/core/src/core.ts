@@ -567,7 +567,10 @@ const fetchAnimationJSON = async (): Promise<IAnimationData | undefined> => {
 
 const setupBreakpointHandler = () => {
   window.addEventListener("resize", () => {
-    const breakpoint = getActiveBreakPoints(animationData)[0].id;
+    const breakpoint = getActiveBreakPoints(animationData)[0]?.id;
+    if (!breakpoint) {
+      return;
+    }
     if (lastActiveBreakpoint !== breakpoint) {
       updateAnimationData(animationData);
     }

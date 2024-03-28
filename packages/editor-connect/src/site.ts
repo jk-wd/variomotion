@@ -80,12 +80,10 @@ export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
 export const connectEditor = async (
   variomotion: VariomotionLib,
   initCallback: () => Promise<void>,
-  config:
-    | {
-        socketPort?: number;
-        [key: string]: unknown;
-      }
-    | undefined
+  config?: {
+    socketPort?: number;
+    [key: string]: unknown;
+  }
 ) => {
   if (connected) {
     variomotion.updateAnimationData(variomotion.getAnimationData());
