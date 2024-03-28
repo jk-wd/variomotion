@@ -38,7 +38,7 @@ let connected: boolean = false;
 export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
   const socket = getSocket();
   if (!socketChannelId || !socket) {
-    throw SocketNotInitializedError;
+    return;
   }
   socket.send(
     JSON.stringify({

@@ -41,7 +41,7 @@ Create the folder where you want to store your animation definitions, in this ca
 From the root of your project run:
 
 ```bash
-touch ./src/animations/animation.json ; echo "{}" > ./src/animations/animation.json
+touch ./src/animations/animation.json ; echo "{\"metaData\": { \"fileName\": \"animation.json\" }}" > ./src/animations/animation.json
 ```
 
 ## Connect variomotion to you app
