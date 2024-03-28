@@ -4,6 +4,7 @@
 
   export let frame: number = 0;
   export let frameSize: number = 0;
+  export let dragable: boolean = true;
 
   export let selected: boolean = false;
 
@@ -25,7 +26,7 @@
 
       const newPosition = Math.max(frameDragTarget.offsetLeft - dragPos1, 0);
       frameDragTarget.style.left = newPosition + "px";
-      if (newPosition !== frame) {
+      if (newPosition !== frame && dragable) {
         frame = newPosition * $timelineValuePerPixel;
       }
     }
@@ -60,7 +61,7 @@
 </script>
 
 <button
-  class={`frame ${selected ? "selected" : ""} ${frameSize ? "sized" : ""}`}
+  class={`frame ${selected ? "selected" : ""} ${!dragable ? "drag-disabled" : ""} ${frameSize ? "sized" : ""}`}
   style={`left:${frame / $timelineValuePerPixel}px; ${frameSizeStyle()}`}
   on:mousedown|preventDefault|stopPropagation={dragFrame()}
   on:mouseover
@@ -80,6 +81,9 @@
     border-radius: 5px;
     background-color: var(--color-blue);
     border: 1px solid var(--color-grey-1);
+  }
+  .frame.drag-disabled {
+    background-color: var(--color-grey-3);
   }
   .frame.sized {
     background-color: var(--color-pink);

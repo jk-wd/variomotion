@@ -47,7 +47,6 @@ export const domStylingParser = (element: IElement) => {
   }
 
   if (stylingValues.borderRadius) {
-    console.log("-->", stylingValues.borderRadius);
     applyStyling(
       element.domElements,
       "borderRadius",

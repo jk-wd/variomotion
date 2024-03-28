@@ -12,6 +12,7 @@
   export let frameColor = `var(--color-blue)`;
 
   export let frames: number[] = [];
+  export let dragDisabled: number[] = [];
 
   export let selectedFrame: number | undefined = undefined;
   export let hoverFrame: number | undefined = undefined;
@@ -41,6 +42,7 @@
     {#each frames as frame, i}
       <Frame
         {frame}
+        dragable={!dragDisabled.includes(frame)}
         selected={selectedFrame === i}
         frameSize={frameSizes[i]}
         on:frameselected={() => {

@@ -12,6 +12,8 @@ import {
   getWrapper,
   blockStylingElements,
   unBlockStylingElements,
+  getValueStore,
+  setValueStore,
 } from "./core";
 
 export * from "./units-map";
@@ -40,4 +42,6 @@ export default {
   onAnimationFrame: setOnAnimationFrameCallback,
   blockStylingElements,
   unBlockStylingElements,
+  getValueStore,
+  setValueStore,
 };

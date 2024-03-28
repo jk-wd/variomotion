@@ -10,23 +10,25 @@ let matchMediaManual: any = undefined;
 export const setMatchMedia = (matchMediaParam: any) => {
   matchMediaManual = matchMediaParam;
 };
-export const getActiveBreakPoint = (
+export const getActiveBreakPoints = (
   animationData?: IAnimationData
-): IBreakpoint => {
+): IBreakpoint[] => {
   const matchMedia = matchMediaManual ? matchMediaManual : window.matchMedia;
-  let result: IBreakpoint = {
-    id: NoBreakpointIdentifier,
-  };
+  let result: IBreakpoint[] = [];
   if (!animationData || !animationData.breakpoints) {
     return result;
   }
   for (const breakpointDefinition of animationData.breakpoints) {
     if (matchMedia(breakpointDefinition.definition).matches) {
-      result = breakpointDefinition;
-      break;
+      result = [...result, breakpointDefinition];
     }
   }
-  return result;
+  return [
+    ...result,
+    {
+      id: NoBreakpointIdentifier,
+    },
+  ];
 };
 
 export const getBreakpointById = (

@@ -1,6 +1,7 @@
 import {
   IAnimationData,
   IAnimationEntry,
+  IBreakpoint,
   IEntry,
   ISequenceEntry,
   ITimeline,
@@ -14,19 +15,21 @@ import {
   SequenceEntryWrongType,
 } from "../errors";
 import { getTimelineById } from "./timeline";
-import { getActiveBreakPoint } from "./breakpoints";
+import { getActiveBreakPoints } from "./breakpoints";
 
 export const isEntryActiveOnBreakpoint = (
   animaitonData: IAnimationData,
   entry: IEntry
 ) => {
-  const breakpoint = getActiveBreakPoint(animaitonData);
+  const breakpoints = getActiveBreakPoints(animaitonData);
 
   if (!entry.activeOnBreakpoints || entry.activeOnBreakpoints.length === 0) {
     return true;
   }
 
-  return entry.activeOnBreakpoints.includes(breakpoint.id);
+  return breakpoints.some((breakpoint: IBreakpoint) =>
+    entry.activeOnBreakpoints!.includes(breakpoint.id)
+  );
 };
 
 export const getEntryById = (animationData: IAnimationData, id: string) => {

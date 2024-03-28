@@ -14,6 +14,8 @@
     getBreakpointById,
     getAnimationEntryById,
     NoBreakpointIdentifier,
+    getFramePosition,
+    getFrameValue,
   } from "@variomotion/core";
   import Box from "../Box/Box.svelte";
 
@@ -51,6 +53,7 @@
     scaleProportianally,
     translateBoolean,
   } from "../../stores/transform";
+  import { valueStore } from "../../stores/value-store";
 
   let frame: IFrameDef | undefined = undefined;
 
@@ -86,10 +89,6 @@
     if (!frame || !fieldValues || !$animationData || !$selectedFrame) {
       return;
     }
-    console.log({
-      ...frame,
-      valueDef: fieldValuesToValueDef(fieldValues),
-    });
     const newFrame = {
       ...frame,
       valueDef: fieldValuesToValueDef(fieldValues),
@@ -117,7 +116,10 @@
       },
       $selectedFrame.index
     );
-    pauseTimeline($selectedFrame.timelineId, frame.framePositionValue);
+    pauseTimeline(
+      $selectedFrame.timelineId,
+      getFramePosition(frame, $valueStore)
+    );
   }
 
   function getFixedValues(type: FixedValuePropTypes) {
@@ -177,18 +179,43 @@
 {#if $selectedFrame}
   <Box>
     <BoxTop>
-      <div class="frame-position">
-        <BoxContent>
-          <NumberInput
-            value={frame?.framePositionValue ?? 0}
-            on:input={handleUpdateFramePosition}
-          />
-        </BoxContent>
-
-        <span>
-          {frame?.frameUnit}
-        </span>
-      </div>
+      <BoxContent>
+        <div class="frame-position">
+          {#if frame}
+            <div class="frame-position-part">
+              <NumberInput
+                disabled={!frame.framePositionValue}
+                value={getFramePosition(frame, $valueStore) ?? 0}
+                on:input={handleUpdateFramePosition}
+              />
+            </div>
+          {/if}
+          <div class="frame-position-part">
+            {frame?.frameUnit}
+          </div>
+          <div class="frame-position-part">
+            <FrameEditSelectField
+              value={frame.framePositionValueStoreKey}
+              fixedValues={Object.keys($valueStore)}
+              on:newvalue={(event) => {
+                if (!$selectedFrame) {
+                  return;
+                }
+                const { value } = event.detail;
+                $animationData = editFrame(
+                  $animationData,
+                  $selectedFrame.entryId,
+                  {
+                    ...frame,
+                    framePositionValueStoreKey: value,
+                  },
+                  $selectedFrame.index
+                );
+              }}
+            />
+          </div>
+        </div>
+      </BoxContent>
       <div class="right">
         <BoxContent>
           <button
@@ -225,32 +252,84 @@
                   {#if Object.keys(NumberValuePropTypes).includes(type)}
                     <BoxContent>
                       <div class="value-wrapper">
-                        <FrameEditNumberField
-                          label={type}
-                          {type}
-                          value={$fieldValues[type][NoBreakpointIdentifier]
-                            ?.value}
-                          unit={$fieldValues[type][NoBreakpointIdentifier]
-                            ?.unit}
-                          easing={$fieldValues[type][NoBreakpointIdentifier]
-                            ?.easing}
-                          on:newvalue={(event) => {
-                            const { value, unit, easing } = event.detail;
+                        <div class="value-store-select first-line">
+                          <FrameEditSelectField
+                            value={$fieldValues[type][NoBreakpointIdentifier]
+                              ?.valueStoreKey}
+                            fixedValues={Object.keys($valueStore)}
+                            on:newvalue={(event) => {
+                              const { value } = event.detail;
+                              $fieldValues[type][NoBreakpointIdentifier] = {
+                                ...($fieldValues[type][
+                                  NoBreakpointIdentifier
+                                ] ?? {}),
+                                valueStoreKey: value,
+                              };
+                              delete $fieldValues[type][NoBreakpointIdentifier]
+                                .value;
+                              handleFormSubmit($fieldValues);
+                            }}
+                          />
+                        </div>
+                        {#if $fieldValues[type][NoBreakpointIdentifier].valueStoreKey}
+                          <FrameEditNumberField
+                            label={type}
+                            {type}
+                            value={getFrameValue(
+                              $fieldValues[type],
+                              NoBreakpointIdentifier,
+                              $valueStore
+                            )}
+                          />
+                        {:else}
+                          <FrameEditNumberField
+                            label={type}
+                            {type}
+                            value={$fieldValues[type][NoBreakpointIdentifier]
+                              ?.value}
+                            unit={$fieldValues[type][NoBreakpointIdentifier]
+                              ?.unit}
+                            easing={$fieldValues[type][NoBreakpointIdentifier]
+                              ?.easing}
+                            on:newvalue={(event) => {
+                              const { value, unit, easing } = event.detail;
 
-                            $fieldValues[type][NoBreakpointIdentifier] = {
-                              value,
-                              unit,
-                              easing,
-                            };
-                            handleFormSubmit($fieldValues);
-                          }}
-                        />
+                              $fieldValues[type][NoBreakpointIdentifier] = {
+                                ...($fieldValues[type][
+                                  NoBreakpointIdentifier
+                                ] ?? {}),
+                                value,
+                                unit,
+                                easing,
+                              };
+                              handleFormSubmit($fieldValues);
+                            }}
+                          />
+                        {/if}
                       </div>
                       {#if $activeBreakpoint && $activeBreakpoint !== NoBreakpointIdentifier}
                         <div
                           class="value-wrapper"
                           style={`border-left: 4px solid ${breakpoint?.color ?? ""}`}
                         >
+                          <div class="value-store-select">
+                            <FrameEditSelectField
+                              value={$fieldValues[type][$activeBreakpoint]
+                                ?.valueStoreKey}
+                              fixedValues={Object.keys($valueStore)}
+                              on:newvalue={(event) => {
+                                const { value } = event.detail;
+                                $fieldValues[type][$activeBreakpoint] = {
+                                  ...($fieldValues[type][$activeBreakpoint] ??
+                                    {}),
+                                  valueStoreKey: value,
+                                };
+                                delete $fieldValues[type][$activeBreakpoint]
+                                  .value;
+                                handleFormSubmit($fieldValues);
+                              }}
+                            />
+                          </div>
                           <FrameEditNumberField
                             {type}
                             value={$fieldValues[type][$activeBreakpoint]?.value}
@@ -261,6 +340,8 @@
                               const { value, unit, easing } = event.detail;
 
                               $fieldValues[type][$activeBreakpoint] = {
+                                ...($fieldValues[type][$activeBreakpoint] ??
+                                  {}),
                                 value,
                                 unit,
                                 easing,
@@ -283,6 +364,8 @@
                           on:newvalue={(event) => {
                             const { value } = event.detail;
                             $fieldValues[type][NoBreakpointIdentifier] = {
+                              ...($fieldValues[type][NoBreakpointIdentifier] ??
+                                {}),
                               value,
                             };
 
@@ -301,6 +384,8 @@
                             on:newvalue={(event) => {
                               const { value } = event.detail;
                               $fieldValues[type][$activeBreakpoint] = {
+                                ...($fieldValues[type][$activeBreakpoint] ??
+                                  {}),
                                 value,
                               };
 
@@ -421,11 +506,25 @@
 {/if}
 
 <style>
+  .value-store-select {
+    position: absolute;
+    top: 0px;
+    right: 0;
+    width: 70px;
+  }
+  .value-store-select.first-line {
+    top: 16px;
+  }
   .value-wrapper {
+    position: relative;
+
+    padding-right: 70px;
+    width: 100%;
     border-left: 4px solid var(--color-grey-1);
     padding-left: 4px;
   }
   .property {
+    position: relative;
     margin-bottom: 8px;
   }
   .bottom-card {
@@ -468,8 +567,11 @@
     width: 21px;
   }
   .frame-position {
-    width: 60px;
+    width: 200px;
     display: flex;
+  }
+  .frame-position-part {
+    width: 100%;
   }
   .right {
     margin-left: auto;

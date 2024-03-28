@@ -1,9 +1,14 @@
 import parserMap from "./value-parsers";
 
-import { calculatePageScroll, numberIsSet } from "./utils";
+import {
+  calculatePageScroll,
+  numberIsSet,
+  getValueStoreValue,
+  debounce,
+} from "./utils";
 import { domStylingParser } from "./styling-parsers";
 import { willChangeMap } from "./will-change-map";
-import { getActiveBreakPoint } from "./data/breakpoints";
+
 import { getTimelineById, isTimelineActiveOnBreakpoint } from "./data/timeline";
 import {
   getAnimationEntryById,
@@ -20,11 +25,11 @@ import {
   NoBreakpointIdentifier,
   ITimeline,
   IElement,
-  IActiveBreakpoint,
   ISequenceAnimation,
   IAnimationEntry,
   ISequenceEntry,
   NumberValuePropTypes,
+  IValueStore,
 } from "./types-interfaces";
 
 import {
@@ -39,6 +44,7 @@ import {
   ISequenceElements,
 } from "./types-interfaces";
 import { getEndFromSequenceAnimation } from "./helpers/sequenceAnimation";
+import { getActiveBreakPoints } from "./data/breakpoints";
 
 let animations: IAnimation[] = [];
 let sequenceAnimations: ISequenceAnimation[] = [];
@@ -46,13 +52,21 @@ let elements: IElements = {};
 let sequenceElements: ISequenceElements = {};
 let options: IOptions;
 let wrapper: HTMLElement;
+let lastActiveBreakpoint: string = NoBreakpointIdentifier;
 let wrapperClientHeight: number = 0;
 let animationFrameId: number;
 let animationData: IAnimationData;
 let onUpdateAnimationDataCallback: (animationData: IAnimationData) => void;
-let activeBreakpoint: IActiveBreakpoint = { id: NoBreakpointIdentifier };
 let lastPixel: number | null = 0;
 const onAnimationFrameCallbacks: (() => void)[] = [];
+
+let valueStore: IValueStore = {};
+export const getValueStore = () => {
+  return valueStore;
+};
+export const setValueStore = (valueStoreParam: IValueStore) => {
+  valueStore = valueStoreParam;
+};
 
 export const setOnAnimationFrameCallback = (callback: () => void) => {
   onAnimationFrameCallbacks.push(callback);
@@ -329,7 +343,15 @@ const prepareTimelinState = (timelineId: string) => {
         id: timeline.id,
       };
     }
-    if (numberIsSet(timeline.startPixel)) {
+    if (
+      timeline.startPixelValueStoreKey &&
+      valueStore[timeline.startPixelValueStoreKey]
+    ) {
+      pixelTimelineStates[timeline.id].start = getValueStoreValue(
+        valueStore,
+        timeline.startPixelValueStoreKey
+      );
+    } else if (numberIsSet(timeline.startPixel)) {
       pixelTimelineStates[timeline.id].start = timeline.startPixel;
     } else if (
       !numberIsSet(pixelTimelineStates[timeline.id].start) &&
@@ -544,12 +566,12 @@ const fetchAnimationJSON = async (): Promise<IAnimationData | undefined> => {
 };
 
 const setupBreakpointHandler = () => {
-  activeBreakpoint = getActiveBreakPoint(animationData);
   window.addEventListener("resize", () => {
-    const newActiveBreakpoint = getActiveBreakPoint(animationData);
-    if (newActiveBreakpoint.id !== activeBreakpoint.id) {
+    const breakpoint = getActiveBreakPoints(animationData)[0].id;
+    if (lastActiveBreakpoint !== breakpoint) {
       updateAnimationData(animationData);
     }
+    lastActiveBreakpoint = breakpoint;
   });
 };
 
@@ -601,7 +623,7 @@ export const init = async (optionsParam?: IOptions) => {
     processAnimationData();
     return;
   }
-
+  valueStore = { ...valueStore, ...optionsParam?.valueStore };
   wrapper = optionsParam?.wrapper ?? document.body;
   wrapperClientHeight = window.innerHeight;
   options = {
@@ -614,7 +636,11 @@ export const init = async (optionsParam?: IOptions) => {
   if (animationDataFetch) {
     animationData = animationDataFetch;
   }
-
+  valueStore = {
+    ...valueStore,
+    ...optionsParam?.valueStore,
+    ...animationData.valueStore,
+  };
   processAnimationData();
   window.cancelAnimationFrame(animationFrameId);
   requestAnimationFrame(loopUpdateAnimations);

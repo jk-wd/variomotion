@@ -1,6 +1,7 @@
 import {
   IAnimationData,
   getFrameById,
+  getFramePosition,
   getTimelineById,
 } from "@variomotion/core";
 import { SocketNotInitializedError } from "./errors";
@@ -65,11 +66,14 @@ export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
 export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
   const animaitonData = variomotion.getAnimationData();
   sendSiteEvent("send-animation-data-to-editor", {
-    ...variomotion.getAnimationData(),
-    metaData: {
-      ...(animaitonData.metaData ?? {}),
-      fileName,
+    animationData: {
+      ...variomotion.getAnimationData(),
+      metaData: {
+        ...(animaitonData.metaData ?? {}),
+        fileName,
+      },
     },
+    valueStore: variomotion.getValueStore(),
   });
 };
 
@@ -165,7 +169,7 @@ export const connectEditor = async (
       const startPx = timelineState?.start ?? 0;
       if (data.pixelBased) {
         window.scrollTo({
-          top: frame.framePositionValue + startPx,
+          top: getFramePosition(frame, variomotion.getValueStore()) + startPx,
           left: 0,
           behavior: "smooth",
         });

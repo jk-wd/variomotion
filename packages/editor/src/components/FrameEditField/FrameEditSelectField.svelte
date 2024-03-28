@@ -4,6 +4,7 @@
 
   const dispatch = createEventDispatcher();
   export let label: string | undefined;
+
   export let value: string | number | undefined;
   export let fixedValues: string[] | number[];
 

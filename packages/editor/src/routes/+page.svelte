@@ -13,7 +13,7 @@
   import Timeline from "../components/Timeline/Timeline.svelte";
   import { browser } from "$app/environment";
   import { animationData } from "../stores/animation-data-store";
-  import type { IAnimationData } from "@variomotion/core";
+  import type { IAnimationData, IValueStore } from "@variomotion/core";
   import {
     activeBreakpoint,
     activePopup,
@@ -39,11 +39,12 @@
   import { page } from "$app/stores";
   import { scaleProportianally, translateBoolean } from "../stores/transform";
   import EditSequenceEntryPopup from "../components/EditSequenceEntryPopup /EditSequenceEntryPopup.svelte";
+  import { valueStore } from "../stores/value-store";
 
   let sendAnimationDataLocked = false;
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    console.log(window.location.search);
+
     const socketPort = urlParams.get("socketport");
     if (!socketPort) {
       throw new Error("socketPort is not defined");
@@ -54,7 +55,8 @@
         if (event.type === "send-animation-data-to-editor" && event.data) {
           domTargets.set(event.domTargets);
           sendAnimationDataLocked = true;
-          animationData.set(event.data as IAnimationData);
+          animationData.set(event.data.animationData as IAnimationData);
+          valueStore.set(event.data.valueStore as IValueStore);
           setTimeout(() => {
             sendAnimationDataLocked = false;
           }, 400);
@@ -201,8 +203,18 @@
 
   <Timeline />
 {/if}
+<div class="beta-tag">Beta 1.0.0</div>
 
 <style>
+  .beta-tag {
+    position: fixed;
+    right: 0;
+    top: 0;
+    background-color: var(--color-pink);
+    color: white;
+    font-family: "ProximaNova-Bold";
+    padding: 4px;
+  }
   .controls-area {
     position: fixed;
     margin: 6px;
@@ -227,12 +239,6 @@
     left: 0;
   }
 
-  button,
-  fieldset,
-  iframe,
-  img {
-    border: 0;
-  }
   :global(h2) {
     font-size: 20px;
     padding-bottom: 6px;
@@ -274,5 +280,6 @@
   }
   :global(a) {
     text-decoration: underline;
+    color: var(--color-blue);
   }
 </style>

@@ -61,7 +61,6 @@
     <div class="multi-select">
       <MultiSelect
         on:change={() => {
-          console.log(selectedDomTargets);
           if (name === undefined && selectedDomTargets.length === 1) {
             name = selectedDomTargets[0];
           }

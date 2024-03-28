@@ -1,11 +1,16 @@
 import { deleteEntry, getEntryById } from "./entry";
-import { EntryTypes, IAnimationData, ITimeline } from "../types-interfaces";
+import {
+  EntryTypes,
+  IAnimationData,
+  IBreakpoint,
+  ITimeline,
+} from "../types-interfaces";
 import {
   EntryNotFound,
   TimelineIdAlreadyUsed,
   TimelineNotFound,
 } from "../errors";
-import { getActiveBreakPoint } from "./breakpoints";
+import { getActiveBreakPoints } from "./breakpoints";
 
 export const getTimelineById = (animationData: IAnimationData, id: string) => {
   return (animationData.timelines || []).find((timeline) => timeline.id === id);
@@ -15,7 +20,7 @@ export const isTimelineActiveOnBreakpoint = (
   animationData: IAnimationData,
   timeline: ITimeline
 ) => {
-  const breakpoint = getActiveBreakPoint(animationData);
+  const breakpoints = getActiveBreakPoints(animationData);
 
   if (
     !timeline.activeOnBreakpoints ||
@@ -24,7 +29,9 @@ export const isTimelineActiveOnBreakpoint = (
     return true;
   }
 
-  return timeline.activeOnBreakpoints.includes(breakpoint.id);
+  return breakpoints.some((breakpoint: IBreakpoint) =>
+    timeline.activeOnBreakpoints!.includes(breakpoint.id)
+  );
 };
 
 export const addTimeline = (

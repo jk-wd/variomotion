@@ -1,9 +1,26 @@
+import { IValueStore } from "./types-interfaces";
+
 export const uuidv4 = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0,
       v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+};
+
+export const getValueStoreValue = (
+  valueStore: IValueStore,
+  key?: string,
+  fallbackValue?: number
+): number => {
+  if (!key) {
+    return fallbackValue ?? 0;
+  }
+  if (valueStore[key] && typeof valueStore[key] === "function") {
+    const item = valueStore[key] as () => number;
+    return item();
+  }
+  return (valueStore[key] ?? fallbackValue) as number;
 };
 
 export const numberIsSet = (value?: number): boolean => {
@@ -27,3 +44,13 @@ export const calculatePageScroll = (startPos: number = 0) => {
     scrollPercentage,
   };
 };
+
+export function debounce(func: (...args: any) => any, timeout = 300) {
+  let timer: NodeJS.Timeout | undefined;
+  return (...args: any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func(...args);
+    }, timeout);
+  };
+}

@@ -6,8 +6,12 @@ import {
   ITimelineStateBase,
   NoBreakpointIdentifier,
   IFrameValue,
+  IValueStore,
+  IBreakpoint,
 } from "../types-interfaces";
-import { getActiveBreakPoint } from "../data/breakpoints";
+import { getActiveBreakPoints } from "../data/breakpoints";
+import { getValueStore } from "../core";
+import { getValueStoreValue } from "../utils";
 
 export const isFrameDefined = (frames: IFrame[], frame: IFrame) => {
   return frames.some((frameToCompare) => {
@@ -79,35 +83,77 @@ export const sortFrames = (
   return 1;
 };
 
+export const getFramePosition = (
+  frameDef: IFrameDef,
+  valueStore: IValueStore
+) => {
+  return getValueStoreValue(
+    valueStore,
+    frameDef.framePositionValueStoreKey,
+    frameDef.framePositionValue
+  );
+};
+
+export const getFrameValue = (
+  valueDef: IFrameValue,
+  breakpoint: string,
+  valueStore: IValueStore
+) => {
+  return getValueStoreValue(
+    valueStore,
+    valueDef[breakpoint].valueStoreKey,
+    valueDef[breakpoint].value as number
+  );
+};
+
 export const processFrameDef = (
   animationData: IAnimationData,
   frameDef: IFrameDef,
   valueDef: IFrameValue,
   useBreakpoints: boolean = true
 ): IFrame => {
-  const breakpoint = !useBreakpoints
-    ? {
-        id: NoBreakpointIdentifier,
-      }
-    : getActiveBreakPoint(animationData);
+  const breakpoints = !useBreakpoints
+    ? [
+        {
+          id: NoBreakpointIdentifier,
+        },
+      ]
+    : getActiveBreakPoints(animationData);
+
+  const framePositionValue = getFramePosition(frameDef, getValueStore());
 
   const frame: Partial<IFrame> = {
     frameUnit: frameDef.frameUnit,
-    framePositionValue: frameDef.framePositionValue,
+    framePositionValue,
   };
 
   if (valueDef) {
     if (valueDef[NoBreakpointIdentifier]) {
-      frame.value = valueDef[NoBreakpointIdentifier].value;
+      frame.value = getFrameValue(
+        valueDef,
+        NoBreakpointIdentifier,
+        getValueStore()
+      );
       frame.unit = valueDef[NoBreakpointIdentifier].unit;
       frame.easing = valueDef[NoBreakpointIdentifier].easing;
     }
 
+    let breapointMatched = false;
     for (const key of Object.keys(valueDef)) {
-      if (key === breakpoint.id && valueDef[key]) {
-        frame.value = valueDef[key].value;
-        frame.unit = valueDef[key].unit;
-        frame.easing = valueDef[key].easing;
+      if (breapointMatched) {
+        break;
+      }
+      for (const breakpoint of breakpoints) {
+        if (breapointMatched) {
+          break;
+        }
+        if (key === breakpoint.id && valueDef[key]) {
+          if (key !== "none") console.log(breakpoints, valueDef, key);
+          frame.value = getFrameValue(valueDef, key, getValueStore());
+          frame.unit = valueDef[key].unit;
+          frame.easing = valueDef[key].easing;
+          breapointMatched = true;
+        }
       }
     }
   }

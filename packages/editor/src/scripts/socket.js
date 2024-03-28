@@ -52,7 +52,7 @@ wss.on('connection', (ws) => {
     
     if(msg.source === 'site' && msg.socketChannelId) {
       if(msg.type === "send-animation-data-to-editor") {
-        saveFile(msg.data)
+        saveFile(msg.data.animationData)
       }
       sites[msg.socketChannelId] = ws
       

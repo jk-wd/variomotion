@@ -2,6 +2,7 @@
   import { createEventDispatcher } from "svelte";
 
   export let value: number | undefined = undefined;
+  export let disabled: boolean = false;
 
   function isNumeric(value: string | number | undefined) {
     if (typeof value != "string") return false;
@@ -13,7 +14,6 @@
     let valueString = event.target.value;
     if (isNumeric(valueString)) {
       value = parseFloat(valueString);
-      
     }
 
     if (valueString === "") {
@@ -26,6 +26,7 @@
 <input
   class="input"
   type="string"
+  {disabled}
   value={value?.toString() || ""}
   on:input={handleInputChange}
   {...$$restProps}

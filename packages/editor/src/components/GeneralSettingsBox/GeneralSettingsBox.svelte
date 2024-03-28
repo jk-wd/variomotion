@@ -11,7 +11,7 @@
   import Button from "../Button/Button.svelte";
 
   import variomotion, {
-    getActiveBreakPoint,
+    getActiveBreakPoints,
     setMatchMedia,
     getBreakpointById,
     type IActiveBreakpoint,
@@ -22,7 +22,7 @@
   import { pauseTimeline } from "@variomotion/editor-connect";
 
   animationData.subscribe((data) => {
-    $activeBreakpoint = getActiveBreakPoint(data).id;
+    $activeBreakpoint = getActiveBreakPoints(data)[0].id;
   });
   const mediaMock = matchMediaMock.create();
   viewportState.subscribe(({ viewportWidth }: ViewportState) => {
@@ -31,7 +31,7 @@
       width: viewportWidth ?? window.innerWidth,
     });
     setMatchMedia(mediaMock);
-    $activeBreakpoint = getActiveBreakPoint($animationData).id;
+    $activeBreakpoint = getActiveBreakPoints($animationData)[0].id;
   });
 
   let breakpoint: IActiveBreakpoint | undefined = undefined;

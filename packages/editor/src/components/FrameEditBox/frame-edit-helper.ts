@@ -16,7 +16,8 @@ export function fieldValuesToValueDef(fieldValues: FieldValues) {
     acc[key] = Object.keys(fieldValues[key]).reduce((acc, breakpointKey) => {
       if (
         !fieldValues![key][breakpointKey].value &&
-        fieldValues![key][breakpointKey].value !== 0
+        fieldValues![key][breakpointKey].value !== 0 &&
+        !fieldValues![key][breakpointKey].valueStoreKey
       ) {
         return acc;
       }
@@ -32,6 +33,7 @@ export function fieldValuesToValueDef(fieldValues: FieldValues) {
       }
       acc[breakpointKey] = {
         value: fieldValues![key][breakpointKey].value,
+        valueStoreKey: fieldValues![key][breakpointKey].valueStoreKey,
         unit: fieldValues![key][breakpointKey].unit,
         easing: fieldValues![key][breakpointKey].easing,
       };
@@ -73,6 +75,7 @@ export function constructFieldValues(
     result[index] = result[index] ?? {};
     breakpointIds.forEach((breakpoint: string) => {
       let value = frame?.valueDef?.[index]?.[breakpoint]?.value;
+      let valueStoreKey = frame?.valueDef?.[index]?.[breakpoint]?.valueStoreKey;
       let unit = frame?.valueDef?.[index]?.[breakpoint]?.unit;
       let easing = frame?.valueDef?.[index]?.[breakpoint]?.easing;
 
@@ -83,6 +86,7 @@ export function constructFieldValues(
         unitMap[index] && unitMap[index][0] ? unitMap[index][0] : undefined;
       result[index][breakpoint] = {
         value,
+        valueStoreKey,
         unit: unit ?? defaultUnit,
         easing,
       };

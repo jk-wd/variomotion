@@ -2,7 +2,7 @@ import {
   MatrixTransformTypes,
   editEntry,
   editFrame,
-  getActiveBreakPoint,
+  getActiveBreakPoints,
   getAnimationEntryById,
   getFrameById,
   getTransformValueFromDef,
@@ -89,7 +89,7 @@ export function setupTransformCanvas(variomotion: VariomotionLib) {
     return;
   }
 
-  const activeBreakpoint = getActiveBreakPoint(animationData)?.id;
+  const activeBreakpoints = getActiveBreakPoints(animationData);
   const entry = getAnimationEntryById(animationData, entryId);
   if (!entry) {
     return;
@@ -109,21 +109,21 @@ export function setupTransformCanvas(variomotion: VariomotionLib) {
   const rotation: number = getTransformValueFromDef(
     frame,
     MatrixTransformTypes.rotate,
-    activeBreakpoint,
+    activeBreakpoints[0].id,
     0
   );
 
   const scaleX: number = getTransformValueFromDef(
     frame,
     MatrixTransformTypes.scaleX,
-    activeBreakpoint,
+    activeBreakpoints[0].id,
     100
   );
 
   const scaleY: number = getTransformValueFromDef(
     frame,
     MatrixTransformTypes.scaleY,
-    activeBreakpoint,
+    activeBreakpoints[0].id,
     100
   );
 
@@ -132,13 +132,13 @@ export function setupTransformCanvas(variomotion: VariomotionLib) {
       x: getTransformValueFromDef(
         frame,
         MatrixTransformTypes.translateX,
-        activeBreakpoint,
+        activeBreakpoints[0].id,
         0
       ),
       y: getTransformValueFromDef(
         frame,
         MatrixTransformTypes.translateY,
-        activeBreakpoint,
+        activeBreakpoints[0].id,
         0
       ),
     },

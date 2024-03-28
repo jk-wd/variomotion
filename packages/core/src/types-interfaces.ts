@@ -47,6 +47,7 @@ export interface IParsedValue {
 export interface IFrame {
   frameUnit?: FrameUnits;
   framePositionValue: number;
+
   unit?: Units;
   easing?: string;
   value: string | number;
@@ -55,6 +56,7 @@ export interface IFrame {
 export interface IFrameDef {
   frameUnit: FrameUnits;
   framePositionValue: number;
+  framePositionValueStoreKey?: string;
   valueDef: {
     [key: string]: IFrameValue;
   };
@@ -64,7 +66,8 @@ export interface IFrameValue {
   [key: string]: {
     easing?: string;
     unit?: Units;
-    value: string | number;
+    value?: string | number;
+    valueStoreKey?: string;
   };
 }
 
@@ -129,6 +132,7 @@ export interface IAnimationData {
     [key: string]: number;
   };
   breakpoints?: IBreakpoint[];
+  valueStore?: IValueStore;
   metaData?: {
     fiileName: string;
     [key: string]: string;
@@ -136,6 +140,7 @@ export interface IAnimationData {
 }
 export interface IOptions {
   url?: string;
+  valueStore?: IValueStore;
   animationData?: IAnimationData | unknown;
   wrapper?: HTMLElement;
   bustCache?: boolean;
@@ -185,6 +190,10 @@ export interface IOffsetStartEnd {
   end: IFrame;
 }
 
+export interface IValueStore {
+  [name: string]: number | ((IValueStore: IValueStore) => number);
+}
+
 export interface ITimeline {
   id: string;
   loop: boolean;
@@ -194,7 +203,7 @@ export interface ITimeline {
   sequenceEntries: string[];
   pixelBased: boolean;
   startPixel?: number;
-
+  startPixelValueStoreKey?: string;
   activeOnBreakpoints?: string[];
 }
 

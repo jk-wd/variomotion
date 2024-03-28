@@ -18,7 +18,6 @@
   export let unit: Units | undefined = undefined;
 
   const handleInputChange = () => {
-    console.log("unit", unit);
     if (!unit) {
       return;
     }

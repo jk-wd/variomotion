@@ -2,6 +2,7 @@
   import {
     addFrame,
     editFrame,
+    getFramePosition,
     type IAnimationEntry,
     type IFrameDef,
   } from "@variomotion/core";
@@ -16,13 +17,24 @@
   import Frames from "../Frames/Frames.svelte";
 
   import { pauseTimeline } from "@variomotion/editor-connect";
+  import { valueStore } from "../../stores/value-store";
 
   export let entry: IAnimationEntry;
   export let timelineId: string = "";
   export let active: boolean = true;
 
+  function getDragDisabledFrames(entry: IAnimationEntry) {
+    return entry.frames.reduce((result: number[] = [], frame: IFrameDef) => {
+      if (frame.framePositionValueStoreKey) {
+        result.push(getFramePosition(frame, $valueStore));
+      }
+      return result;
+    }, []);
+  }
   function frames(entry: IAnimationEntry) {
-    return entry.frames.map((frame: IFrameDef) => frame.framePositionValue);
+    return entry.frames.map((frame: IFrameDef) => {
+      return getFramePosition(frame, $valueStore);
+    });
   }
 
   let entryTimeline: HTMLButtonElement | null = null;
@@ -53,6 +65,7 @@
     on:click={onMouseMoveTimeline}
   >
     <Frames
+      dragDisabled={getDragDisabledFrames(entry)}
       selectedFrame={$selectedFrame?.entryId === entry.id
         ? $selectedFrame?.index
         : undefined}
@@ -76,7 +89,7 @@
       on:frameselected={(event) => {
         pauseTimeline(
           timelineId,
-          entry.frames[event.detail].framePositionValue
+          getFramePosition(entry.frames[event.detail], $valueStore)
         );
         $selectedFrame = {
           timelineId,
