@@ -1,10 +1,10 @@
 {
   "name": "@variomotion/editor-connect",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "description": "Animation library, create and maintain (parallax)animations the easy way",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/joriskuijper/easy-parallax.git"
+    "url": "https://github.com/jk-wd/variomotion.git"
   },
   "bin": {
     "run": "src/cli.js"
@@ -36,8 +36,8 @@
   },
   "keywords": [],
   "dependencies": {
-    "@variomotion/core": "^1.0.0-beta.11",
-    "@variomotion/transform": "^1.0.0-beta.11"
+    "@variomotion/core": "^1.0.0-beta.12",
+    "@variomotion/transform": "^1.0.0-beta.12"
   },
   "publishConfig": {
     "access": "public"

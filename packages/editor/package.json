@@ -1,6 +1,6 @@
 {
   "name": "@variomotion/editor",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "scripts": {
     "dev": "vite dev --port 6622",
     "build": "vite build",
@@ -12,6 +12,10 @@
   "bin": {
     "variomotion-editor": "./src/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jk-wd/variomotion.git"
+  },
   "type": "module",
   "dependencies": {
     "@iconify/svelte": "^3.1.4",
@@ -21,9 +25,9 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@types/match-media-mock": "^0.1.8",
     "@types/uuid": "^9.0.7",
-    "@variomotion/core": "^1.0.0-beta.11",
-    "@variomotion/editor-connect": "^1.0.0-beta.11",
-    "@variomotion/transform": "^1.0.0-beta.11",
+    "@variomotion/core": "^1.0.0-beta.12",
+    "@variomotion/editor-connect": "^1.0.0-beta.12",
+    "@variomotion/transform": "^1.0.0-beta.12",
     "async": "^3.2.5",
     "match-media-mock": "^0.1.1",
     "open": "^10.0.0",

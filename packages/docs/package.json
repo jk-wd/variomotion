@@ -1,9 +1,12 @@
 {
   "name": "@variomotion/docs",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "description": "Animation library, create and maintain (parallax)animations the easy way",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/joriskuijper/easy-parallax.git"
+    "url": "https://github.com/jk-wd/variomotion.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
