@@ -1,30 +1,32 @@
 # Quick start
 
+## choose your framework
+
+You can use variomotion in combination with any front-end framework.
+
+For this example we use **React**
+
+```bash
+npx create-react-app variomotion-example --template typescript
+```
+
 ## install
+
+Install the variomotion core:
 
 ```bash
 npm install @variomotion/core
 ```
 
-and the `devDependencies`, needed for running the editor:
+And for the editor we need the follwing `devDependencies`:
 
 ```bash
 npm install @variomotion/editor @variomotion/editor-connect --save-dev
 ```
 
-## choose your framework
+## Setup the config file
 
-You can use variomotion in combination with any framework.
-
-For this example we use React
-
-```bash
-npx create-react-app variomotion-example
-```
-
-## Create config file
-
-Create a `vario.config.json` file in the root of your project,
+Create a `vario.config.json` file in the root of your project, containing the follwing fields:
 
 ```json
 {
@@ -32,8 +34,6 @@ Create a `vario.config.json` file in the root of your project,
 }
 ```
 
-Create the folder where you want to store your animation definition files, in this case: `/src/animations`
+Create the folder where you want to store your animation definitions, in this case: `/src/animations`.
 
 ## Connect
-
-Create a `vario.config.json` file in the root of your project,

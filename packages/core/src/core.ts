@@ -380,7 +380,7 @@ const prepareTimelinState = (timelineId: string) => {
       if (timeline.pixelBased) {
         lastPixel = Math.max(
           (timelineState.start ?? 0) + timelineState.duration,
-          lastPixel
+          lastPixel ?? 0
         );
       }
     }
@@ -394,7 +394,7 @@ const prepareTimelinState = (timelineId: string) => {
       if (timeline.pixelBased) {
         lastPixel = Math.max(
           (timelineState.start ?? 0) + timelineState.duration,
-          lastPixel
+          lastPixel ?? 0
         );
       }
     }
