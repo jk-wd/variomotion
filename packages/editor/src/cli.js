@@ -18,11 +18,11 @@ const argv = yargs(hideBin(process.argv)).argv
 const config = JSON.parse(fs.readFileSync(path.resolve(argv.config ?? './vario.config.json')));
 fs.writeFileSync(path.resolve(__dirname, './localconfig.json'), JSON.stringify(config))
 
-
+console.log(config.socketPort ?? 8787)
 
 const command2 = spawn(`node`, [`${__dirname}/scripts/socket.js`, '--port=5454']);
 const command = spawn(`node`,  [`${__dirname}/scripts/editor.js`]);
-const command3 = spawn(`node`, [`${__dirname}/scripts/open.js`, `--url=${argv.url}`,  `--socketPort=${config.socketPort}`]);
+const command3 = spawn(`node`, [`${__dirname}/scripts/open.js`, `--url=${argv.url}`,  `--socketPort=${config.socketPort ?? 8787}`]);
 
 
 command.stdout.on('data', function (data) {

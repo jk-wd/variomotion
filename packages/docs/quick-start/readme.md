@@ -36,4 +36,18 @@ Create a `vario.config.json` file in the root of your project, containing the fo
 
 Create the folder where you want to store your animation definitions, in this case: `/src/animations`.
 
-## Connect
+## Create empty animation file
+
+From the root of your project run:
+
+```bash
+touch ./src/animations/animation.json ; echo "{}" > ./src/animations/animation.json
+```
+
+## Connect variomotion to you app
+
+Almost there! We can start connecting variomotion to your app. In case of react open the `App.tsx` file
+
+```bash
+touch ./src/animations/animation.json ; echo "{}" > ./src/animations/animation.json
+```

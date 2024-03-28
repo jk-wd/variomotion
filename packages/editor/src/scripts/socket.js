@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 const config = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../localconfig.json')));
 
 const wss = new WebSocketServer({
-  port: config.socketPort ?? 7766,
+  port: config.socketPort ?? 8787,
   perMessageDeflate: {
     zlibDeflateOptions: {
       // See zlib defaults.
