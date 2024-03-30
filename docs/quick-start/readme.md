@@ -4,7 +4,8 @@
 
 You can use variomotion in combination with any front-end framework.
 
-For this example we use **React**
+For this example we use **React**. The end result of this quick start guide can be found here:
+https://github.com/jk-wd/variomotion-react-example
 
 ```bash
 npx create-react-app variomotion-example --template typescript
@@ -115,6 +116,6 @@ Step 2 start the editor,
 npx variomotion-editor --url=http://localhost:3000
 ```
 
-**_important!: make sure the portnumber matches the port number from step 1._**
+**_important!: make sure the port number matches the output port number from step 1._**
 
 Now we are ready to make our first animation. Goto: the [Editor section](../editor/readme.md) to get started.
