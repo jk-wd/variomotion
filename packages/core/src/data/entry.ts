@@ -18,10 +18,10 @@ import { getTimelineById } from "./timeline";
 import { getActiveBreakPoints } from "./breakpoints";
 
 export const isEntryActiveOnBreakpoint = (
-  animaitonData: IAnimationData,
+  animationData: IAnimationData,
   entry: IEntry
 ) => {
-  const breakpoints = getActiveBreakPoints(animaitonData);
+  const breakpoints = getActiveBreakPoints(animationData);
 
   if (!entry.activeOnBreakpoints || entry.activeOnBreakpoints.length === 0) {
     return true;
@@ -119,7 +119,7 @@ export const removeEntryReferences = (
   animationEntryId: string
 ): IAnimationData => {
   const timelines = animationData.timelines ? animationData.timelines : [];
-  const animationDataResult = {
+  const animationDataResult: IAnimationData = {
     ...animationData,
     timelines: timelines.map((timeline: ITimeline) => {
       return {

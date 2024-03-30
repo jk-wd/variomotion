@@ -14,19 +14,15 @@ export const getActiveBreakPoints = (
   animationData?: IAnimationData
 ): IBreakpoint[] => {
   const matchMedia = matchMediaManual ? matchMediaManual : window.matchMedia;
-  let result: IBreakpoint[] = [
-    {
-      id: NoBreakpointIdentifier,
-    },
-  ];
-  if (!animationData || !animationData.breakpoints) {
-    return result;
-  }
-  for (const breakpointDefinition of animationData.breakpoints) {
-    if (matchMedia(breakpointDefinition.definition).matches) {
-      result = [...result, breakpointDefinition];
+  let result: IBreakpoint[] = [];
+  if (animationData && animationData.breakpoints) {
+    for (const breakpointDefinition of animationData.breakpoints) {
+      if (matchMedia(breakpointDefinition.definition).matches) {
+        result = [...result, breakpointDefinition];
+      }
     }
   }
+
   return [
     ...result,
     {

@@ -14,7 +14,7 @@ import {
   sendDimensionsToEditor,
   sendTimelineStatesToEditor,
 } from "./site";
-import { DomtargetDimensions, FrameEventData, VariomotionLib } from "./types";
+import { DomtargetDimensions, FrameEventData } from "./types";
 import {
   TransformRect,
   TransformState,
@@ -22,6 +22,7 @@ import {
   tearDownTransform,
   transformElement,
 } from "@variomotion/transform";
+import { VariomotionProject } from "@variomotion/core";
 
 const dimensionStore: Record<string, DomtargetDimensions> = {};
 let activeFrame: FrameEventData | undefined = undefined;
@@ -48,18 +49,18 @@ export function setDomTargetDimensions() {
   });
 }
 
-export function connectVariomotion(variomotion: VariomotionLib) {
-  variomotion.onAnimationFrame(() => {
-    sendTimelineStatesToEditor(variomotion);
+export function connectVariomotion(project: VariomotionProject) {
+  project.onAnimationFrame(() => {
+    sendTimelineStatesToEditor(project);
     if (!activeFrame) {
       return;
     }
 
-    const timelineStates = variomotion.getPixelTimelineStates();
+    const timelineStates = project.pixelTimelineStates;
     const timelineState = timelineStates[activeFrame.timelineId];
 
     const frame = getFrameById(
-      variomotion.getAnimationData(),
+      project.animationData,
       activeFrame.entryId,
       activeFrame.index
     );
@@ -71,24 +72,23 @@ export function connectVariomotion(variomotion: VariomotionLib) {
 }
 
 let transformCanvasTimeout: NodeJS.Timeout | undefined;
-export function transformCanvas(variomotion: VariomotionLib) {
+export function transformCanvas(project: VariomotionProject) {
   transformCanvasTimeout = setTimeout(() => {
-    setupTransformCanvas(variomotion);
+    setupTransformCanvas(project);
     clearTimeout(transformCanvasTimeout);
   }, 200);
 }
 
-export function setupTransformCanvas(variomotion: VariomotionLib) {
+export function setupTransformCanvas(project: VariomotionProject) {
   if (!activeFrame) {
     return;
   }
   const { entryId, index } = activeFrame;
 
-  const animationData = variomotion.getAnimationData();
+  const animationData = project.animationData;
   if (!animationData) {
     return;
   }
-
   const activeBreakpoints = getActiveBreakPoints(animationData);
   const entry = getAnimationEntryById(animationData, entryId);
   if (!entry) {
@@ -182,12 +182,12 @@ export function setupTransformCanvas(variomotion: VariomotionLib) {
         },
         index
       );
-      variomotion.updateAnimationData(animationDataUpdated);
+      project.updateAnimationData(animationDataUpdated);
 
-      sendAnimationDataToEditor(variomotion);
+      sendAnimationDataToEditor(project);
       if (activeFrame) {
         tearDownTransform();
-        setupTransformCanvas(variomotion);
+        setupTransformCanvas(project);
       }
     },
   });

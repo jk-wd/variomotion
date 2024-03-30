@@ -1,7 +1,7 @@
 import { addBreakpoint, editBreakpoint, deleteBreakpoint } from "./breakpoints";
 import { BreakpointIdAlreadyUsed } from "../errors";
 
-const animaitonData = {
+const animationData = {
   breakpoints: [
     {
       id: "small",
@@ -12,7 +12,7 @@ const animaitonData = {
 
 test("data/breakpoints.ts (editBreakpoint) should correctly update the referenced breakpoint", () => {
   expect(
-    editBreakpoint(animaitonData as any, {
+    editBreakpoint(animationData as any, {
       id: "small",
       definition: "(max-width: 900px)",
     })
@@ -27,7 +27,7 @@ test("data/breakpoints.ts (editBreakpoint) should correctly update the reference
 });
 
 test("data/breakpoints.ts (addBreakpoint) should add a new breakpoint", () => {
-  const result = addBreakpoint(animaitonData as any, {
+  const result = addBreakpoint(animationData as any, {
     id: "medium",
     definition: "(max-width: 1900px)",
   });
@@ -37,14 +37,14 @@ test("data/breakpoints.ts (addBreakpoint) should add a new breakpoint", () => {
 
 test("data/breakpoints.ts (addBreakpoint) should throw an error when the id is already used", () => {
   expect(() => {
-    addBreakpoint(animaitonData as any, {
+    addBreakpoint(animationData as any, {
       id: "small",
     });
   }).toThrow(BreakpointIdAlreadyUsed.message);
 });
 
 test("data/breakpoints.ts (deleteBreakpoint) remove an breakpoint", () => {
-  expect(deleteBreakpoint(animaitonData as any, "small")).toEqual({
+  expect(deleteBreakpoint(animationData as any, "small")).toEqual({
     breakpoints: [],
   });
 });

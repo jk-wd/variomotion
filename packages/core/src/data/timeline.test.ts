@@ -10,7 +10,7 @@ import {
   TimelineNotFound,
 } from "../errors";
 
-const animaitonData = {
+const animationData = {
   metaData: { fileName: "mock.json" },
   timelines: [
     {
@@ -72,7 +72,7 @@ const animaitonData = {
 
 test("data/timeline.ts (editTimeline) should correctly update the referenced timeline", () => {
   expect(
-    editTimeline(animaitonData as any, {
+    editTimeline(animationData as any, {
       id: "timeline-1",
       loop: true,
       pixelBased: false,
@@ -139,7 +139,7 @@ test("data/timeline.ts (editTimeline) should correctly update the referenced tim
 });
 test("data/timeline.ts (addTimeline) should add a new timeline", () => {
   expect(
-    addTimeline(animaitonData as any, {
+    addTimeline(animationData as any, {
       id: "timeline-3",
       loop: true,
       pixelBased: false,
@@ -219,7 +219,7 @@ test("data/timeline.ts (addTimeline) should add a new timeline", () => {
   });
 });
 test("data/timeline.ts (deleteTimeline) should delete the timeline with the given id", () => {
-  expect(deleteTimeline(animaitonData as any, "timeline-2")).toEqual({
+  expect(deleteTimeline(animationData as any, "timeline-2")).toEqual({
     metaData: { fileName: "mock.json" },
     timelines: [
       {
@@ -256,7 +256,7 @@ test("data/timeline.ts (deleteTimeline) should delete the timeline with the give
 
 test("data/timeline.ts (addTimeline) should throw an error when the id is already used", () => {
   expect(() => {
-    addTimeline(animaitonData as any, {
+    addTimeline(animationData as any, {
       id: "timeline-2",
       loop: true,
       pixelBased: false,
@@ -269,7 +269,7 @@ test("data/timeline.ts (addTimeline) should throw an error when the id is alread
 
 test("data/timeline.ts (connectTimelineEntry) should connect an entry to the specified timeline", () => {
   expect(
-    connectTimelineEntry(animaitonData as any, "timeline-1", "3", "sequence")
+    connectTimelineEntry(animationData as any, "timeline-1", "3", "sequence")
   ).toEqual({
     metaData: { fileName: "mock.json" },
     timelines: [
@@ -333,14 +333,14 @@ test("data/timeline.ts (connectTimelineEntry) should connect an entry to the spe
 
 test("data/timeline.ts (connectTimelineEntry) should throw an error when timeline id doesnt exist", () => {
   expect(() => {
-    connectTimelineEntry(animaitonData as any, "timeline-9", "3", "sequence");
+    connectTimelineEntry(animationData as any, "timeline-9", "3", "sequence");
   }).toThrow(TimelineNotFound.message);
 });
 
 test("data/timeline.ts (connectTimelineEntry) should throw an error when entry is not found", () => {
   expect(() => {
     connectTimelineEntry(
-      animaitonData as any,
+      animationData as any,
       "timeline-2",
       "non existing entry id",
       "sequence"
@@ -351,7 +351,7 @@ test("data/timeline.ts (connectTimelineEntry) should throw an error when entry i
 test("data/timeline.ts (connectTimelineEntry) should throw an error when entry id doesnt exist", () => {
   expect(() => {
     connectTimelineEntry(
-      animaitonData as any,
+      animationData as any,
       "timeline-1",
       "30000",
       "sequence"

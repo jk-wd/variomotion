@@ -23,7 +23,7 @@ export function getDomTargets(type?: string) {
 export function getDomTargetDimension(
   id: string
 ): DomtargetDimensions | undefined {
-  const targets = document.querySelectorAll(`[data-v="${id}"]`) ?? [];
+  const targets = document.querySelectorAll(`[data-v~="${id}"]`) ?? [];
   if (!targets || targets.length === 0) {
     return;
   }

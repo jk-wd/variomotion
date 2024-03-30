@@ -3,8 +3,8 @@ import {
   getFrameById,
   getFramePosition,
   getTimelineById,
+  VariomotionProject,
 } from "@variomotion/core";
-import { SocketNotInitializedError } from "./errors";
 import { getDomTargetsSite } from "./helper";
 import { getSocket, setupSocket } from "./socket";
 import {
@@ -13,7 +13,6 @@ import {
   PlayPauseEventData,
   SocketEvent,
   SocketEventSite,
-  VariomotionLib,
 } from "./types";
 import {
   PointBoolean,
@@ -32,8 +31,7 @@ import {
 
 let scrollToInterval: NodeJS.Timeout;
 let socketChannelId: string | undefined;
-let fileName: string;
-let connected: boolean = false;
+let project: VariomotionProject;
 
 export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
   const socket = getSocket();
@@ -52,10 +50,10 @@ export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
   );
 }
 
-export const sendTimelineStatesToEditor = (variomotion: VariomotionLib) => {
+export const sendTimelineStatesToEditor = (project: VariomotionProject) => {
   sendSiteEvent("send-timeline-states-to-editor", {
-    timelineStates: variomotion.getTimelineStates(),
-    pixelTimelineStates: variomotion.getPixelTimelineStates(),
+    timelineStates: project.timelineStates,
+    pixelTimelineStates: project.pixelTimelineStates,
   });
 };
 
@@ -63,65 +61,51 @@ export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
   sendSiteEvent("send-dimensions-to-editor", dimensions);
 };
 
-export const sendAnimationDataToEditor = (variomotion: VariomotionLib) => {
-  const animaitonData = variomotion.getAnimationData();
+export const sendAnimationDataToEditor = (project: VariomotionProject) => {
+  const animationData = project.animationData;
   sendSiteEvent("send-animation-data-to-editor", {
     animationData: {
-      ...variomotion.getAnimationData(),
+      ...project.animationData,
       metaData: {
-        ...(animaitonData.metaData ?? {}),
-        fileName,
+        ...(animationData.metaData ?? {}),
       },
     },
-    valueStore: variomotion.getValueStore(),
+    valueStore: project.valueStore,
   });
 };
 
 export const connectEditor = async (
-  variomotion: VariomotionLib,
-  initCallback: () => Promise<void>,
-  config?: {
-    socketPort?: number;
-    [key: string]: unknown;
+  initCallback: () => Promise<VariomotionProject>
+): Promise<VariomotionProject> => {
+  if (project) {
+    project.processAnimationData();
+    return project;
   }
-) => {
-  if (connected) {
-    variomotion.updateAnimationData(variomotion.getAnimationData());
-    return;
-  }
-  await setupSocket(config?.socketPort ?? 8787);
+  await setupSocket(8787);
   await setDomTargetDimensions();
-  await initCallback();
+  project = await initCallback();
   const socket = getSocket();
 
-  const url = variomotion.getOptions().url;
-  const animaitonData = variomotion.getAnimationData();
-  fileName = animaitonData?.metaData?.fileName
-    ? animaitonData?.metaData?.fileName
-    : url?.split("/").pop() ?? "";
   socketChannelId =
     new URL(window.location.href).searchParams.get("socketChannelId") ??
     undefined;
-  connectVariomotion(variomotion);
-  sendAnimationDataToEditor(variomotion);
+  connectVariomotion(project);
+  sendAnimationDataToEditor(project);
 
   socket.addEventListener("message", (message) => {
     const event = JSON.parse(message.data) as SocketEvent;
     if (event.type === "send-animation-data-to-site") {
-      variomotion.updateAnimationData(event.data as IAnimationData);
+      project.updateAnimationData(event.data as IAnimationData);
       tearDownTransform();
       const activeFrame = getActiveFrame();
       if (activeFrame) {
-        transformCanvas(variomotion);
+        transformCanvas(project);
       }
     }
     if (event.type === "pause-timeline") {
       const data = event.data as PlayPauseEventData;
-      variomotion.pause(data.timelineId, data.position);
-      const timeline = getTimelineById(
-        variomotion.getAnimationData(),
-        data.timelineId
-      );
+      project.pause(data.timelineId, data.position);
+      const timeline = getTimelineById(project.animationData, data.timelineId);
       if (timeline?.pixelBased && data.position && data.scrollTo) {
         window.scrollTo({
           top: data.position + (timeline.startPixel ?? 0),
@@ -133,7 +117,7 @@ export const connectEditor = async (
 
     if (event.type === "play-timeline") {
       const data = event.data as PlayPauseEventData;
-      variomotion.play(data.timelineId, data.position);
+      project.play(data.timelineId, data.position);
     }
 
     if (event.type === "framedeselect") {
@@ -162,17 +146,17 @@ export const connectEditor = async (
       }
       setActiveFrame(data);
       const frame = getFrameById(
-        variomotion.getAnimationData(),
+        project.animationData,
         data.entryId,
         data.index
       );
 
-      const timelineStates = variomotion.getPixelTimelineStates();
+      const timelineStates = project.pixelTimelineStates;
       const timelineState = timelineStates[data.timelineId];
       const startPx = timelineState?.start ?? 0;
       if (data.pixelBased) {
         window.scrollTo({
-          top: getFramePosition(frame, variomotion.getValueStore()) + startPx,
+          top: getFramePosition(frame, project.valueStore) + startPx,
           left: 0,
           behavior: "smooth",
         });
@@ -180,19 +164,19 @@ export const connectEditor = async (
           if (frame.framePositionValue + startPx === window.scrollY) {
             setTransformMode(data.transformMode);
 
-            transformCanvas(variomotion);
+            transformCanvas(project);
             clearInterval(scrollToInterval);
           }
         }, 10);
       } else {
         clearInterval(scrollToInterval);
         setTransformMode(data.transformMode);
-        transformCanvas(variomotion);
+        transformCanvas(project);
       }
     }
 
     if (event.type === "set-timeline-progress") {
-      const timelineStates = variomotion.getTimelineStates();
+      const timelineStates = project.timelineStates;
 
       const data = event.data as {
         progress: number;
@@ -203,6 +187,5 @@ export const connectEditor = async (
       }
     }
   });
-  connected = true;
-  return variomotion;
+  return project;
 };

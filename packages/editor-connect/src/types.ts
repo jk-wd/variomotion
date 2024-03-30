@@ -16,7 +16,8 @@ export interface SocketEvent {
     | "framedeselect"
     | "send-dimensions-to-editor"
     | "scaleproportianally"
-    | "translateboolean";
+    | "translateboolean"
+    | "save-file";
   host: string;
   data: unknown;
 }
@@ -45,5 +46,3 @@ export interface DomtargetDimensions {
 
   svgElement?: SVGSVGElement;
 }
-
-export type VariomotionLib = typeof variomotionLib;

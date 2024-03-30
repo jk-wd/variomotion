@@ -63,6 +63,10 @@ export const playTimeline = (timelineId: string, position?: number) => {
   sendEditorEvent("play-timeline", { timelineId, position });
 };
 
+export const saveFile = (animationData: IAnimationData) => {
+  console.log("saveFile", animationData);
+  sendEditorEvent("save-file", animationData);
+};
 export const setTimelineProgress = (timelineId: string, progress: number) => {
   sendEditorEvent("set-timeline-progress", { timelineId, progress });
 };

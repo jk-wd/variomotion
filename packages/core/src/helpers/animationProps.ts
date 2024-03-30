@@ -1,3 +1,4 @@
+import { VariomotionProject } from "../core";
 import {
   IAnimationProps,
   IAnimationData,
@@ -33,14 +34,14 @@ function applyDefaults(
 }
 
 export const processFrameDefinitions = (
-  animationData: IAnimationData,
+  project: VariomotionProject,
   frameDefs: IFrameDef[],
   timeline: ITimeline,
   entry: IAnimationEntry
 ): IAnimationProps => {
   const result: IAnimationProps = {};
   (frameDefs ?? []).forEach((frameDef) => {
-    const valueDef = applyDefaults(animationData, frameDef.valueDef);
+    const valueDef = applyDefaults(project.animationData, frameDef.valueDef);
 
     Object.keys(valueDef).forEach((valueKey: string) => {
       if (!valueDef || !valueDef[valueKey]) {
@@ -56,12 +57,7 @@ export const processFrameDefinitions = (
       );
 
       result[valueKey].push(
-        processFrameDef(
-          animationData,
-          frameDef,
-          valueDef[valueKey],
-          useBreakpoints
-        )
+        processFrameDef(project, frameDef, valueDef[valueKey], useBreakpoints)
       );
     });
   });

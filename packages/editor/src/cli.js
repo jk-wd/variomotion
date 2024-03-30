@@ -20,7 +20,7 @@ fs.writeFileSync(path.resolve(__dirname, './localconfig.json'), JSON.stringify(c
 
 console.log(config.socketPort ?? 8787)
 
-const command2 = spawn(`node`, [`${__dirname}/scripts/socket.js`, '--port=5454']);
+const command2 = spawn(`node`, [`${__dirname}/scripts/socket.js`]);
 const command = spawn(`node`,  [`${__dirname}/scripts/editor.js`]);
 const command3 = spawn(`node`, [`${__dirname}/scripts/open.js`, `--url=${argv.url}`,  `--socketPort=${config.socketPort ?? 8787}`]);
 

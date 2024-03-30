@@ -7,11 +7,11 @@ import {
   NoBreakpointIdentifier,
   IFrameValue,
   IValueStore,
-  IBreakpoint,
 } from "../types-interfaces";
 import { getActiveBreakPoints } from "../data/breakpoints";
-import { getValueStore } from "../core";
+
 import { getValueStoreValue } from "../utils";
+import { VariomotionProject } from "../core";
 
 export const isFrameDefined = (frames: IFrame[], frame: IFrame) => {
   return frames.some((frameToCompare) => {
@@ -107,7 +107,7 @@ export const getFrameValue = (
 };
 
 export const processFrameDef = (
-  animationData: IAnimationData,
+  project: VariomotionProject,
   frameDef: IFrameDef,
   valueDef: IFrameValue,
   useBreakpoints: boolean = true
@@ -118,9 +118,9 @@ export const processFrameDef = (
           id: NoBreakpointIdentifier,
         },
       ]
-    : getActiveBreakPoints(animationData);
+    : getActiveBreakPoints(project.animationData);
 
-  const framePositionValue = getFramePosition(frameDef, getValueStore());
+  const framePositionValue = getFramePosition(frameDef, project.valueStore);
 
   const frame: Partial<IFrame> = {
     frameUnit: frameDef.frameUnit,
@@ -132,7 +132,7 @@ export const processFrameDef = (
       frame.value = getFrameValue(
         valueDef,
         NoBreakpointIdentifier,
-        getValueStore()
+        project.valueStore
       );
       frame.unit = valueDef[NoBreakpointIdentifier].unit;
       frame.easing = valueDef[NoBreakpointIdentifier].easing;
@@ -148,8 +148,7 @@ export const processFrameDef = (
           break;
         }
         if (key === breakpoint.id && valueDef[key]) {
-          if (key !== "none") console.log(breakpoints, valueDef, key);
-          frame.value = getFrameValue(valueDef, key, getValueStore());
+          frame.value = getFrameValue(valueDef, key, project.valueStore);
           frame.unit = valueDef[key].unit;
           frame.easing = valueDef[key].easing;
           breapointMatched = true;

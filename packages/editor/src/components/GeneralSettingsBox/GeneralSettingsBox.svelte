@@ -19,7 +19,7 @@
   import matchMediaMock from "match-media-mock";
   import NumberInput from "../Input/NumberInput.svelte";
   import BreakpointDot from "../BreakpointDot/BreakpointDot.svelte";
-  import { pauseTimeline } from "@variomotion/editor-connect";
+  import { saveFile } from "@variomotion/editor-connect";
 
   animationData.subscribe((data) => {
     $activeBreakpoint = getActiveBreakPoints(data)[0].id;
@@ -42,6 +42,14 @@
 </script>
 
 <Box>
+  <BoxContent>
+    <Button
+      variant="tiny"
+      on:click={() => {
+        saveFile($animationData);
+      }}>Save file</Button
+    >
+  </BoxContent>
   <span class="breakpoint"
     >Active bp:
 

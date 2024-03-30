@@ -124,27 +124,19 @@ export interface IPixelTimelineState extends ITimelineStateBase {
   loopCount?: number;
 }
 export interface IAnimationData {
-  variomotionVersion: string;
   entries?: IEntry[];
-  activePixelTimelines: string[];
-  timelines: ITimeline[];
+  activePixelTimelines?: string[];
+  timelines?: ITimeline[];
   numbers?: {
     [key: string]: number;
   };
   breakpoints?: IBreakpoint[];
   valueStore?: IValueStore;
   metaData?: {
-    fiileName: string;
+    variomotionVersion: string;
+    projectName: string;
     [key: string]: string;
   };
-}
-export interface IOptions {
-  url?: string;
-  valueStore?: IValueStore;
-  animationData?: IAnimationData | unknown;
-  wrapper?: HTMLElement;
-  bustCache?: boolean;
-  useEditor?: boolean;
 }
 
 export interface INumberObject {

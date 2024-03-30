@@ -1,20 +1,5 @@
-import {
-  init,
-  getOptions,
-  play,
-  pause,
-  updateAnimationData,
-  getAnimationData,
-  getTimelineStates,
-  getPixelTimelineStates,
-  onUpdateAnimationData,
-  setOnAnimationFrameCallback,
-  getWrapper,
-  blockStylingElements,
-  unBlockStylingElements,
-  getValueStore,
-  setValueStore,
-} from "./core";
+import { VariomotionProject } from "./core";
+import { generateShortUID } from "./utils";
 
 export * from "./units-map";
 export * from "./easing-functions";
@@ -26,22 +11,28 @@ export * from "./data/entry";
 export * from "./data/frame";
 export * from "./helpers/frame";
 export * from "./helpers/animationProps";
+export * from "./core";
 
-//API
+interface IProjectStoreItem {
+  project: VariomotionProject;
+  target: (id: string) => string;
+}
+
+const projectStore: Record<string, IProjectStoreItem> = {};
+
+export const project = (projectName: string): IProjectStoreItem => {
+  if (projectStore[projectName]) {
+    return projectStore[projectName];
+  }
+  const scopeId = generateShortUID();
+  projectStore[projectName] = {
+    target: (id: string) => `${scopeId} ${id}`,
+    project: new VariomotionProject(scopeId),
+  };
+  return projectStore[projectName];
+};
+
 export default {
-  init,
-  getWrapper,
-  getOptions,
-  play,
-  pause,
-  updateAnimationData,
-  getAnimationData,
-  getPixelTimelineStates,
-  getTimelineStates,
-  onUpdateAnimationData,
-  onAnimationFrame: setOnAnimationFrameCallback,
-  blockStylingElements,
-  unBlockStylingElements,
-  getValueStore,
-  setValueStore,
+  projectStore,
+  project,
 };
