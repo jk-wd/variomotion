@@ -18,6 +18,7 @@
     activeBreakpoint,
     activePopup,
     pixelTimelineMode,
+    scopeId,
     selectedFrame,
     transformMode,
   } from "../stores/ui-state-store";
@@ -53,7 +54,15 @@
       $socketState.socketChannelId,
       (event: SocketEventSite) => {
         if (event.type === "send-animation-data-to-editor" && event.data) {
-          domTargets.set(event.domTargets);
+          scopeId.set(event.scopeId);
+          domTargets.set({
+            regular: event.domTargets.regular.filter(
+              (target: string) => event.scopeId !== target
+            ),
+            sequence: event.domTargets.sequence.filter(
+              (target: string) => event.scopeId !== target
+            ),
+          });
           sendAnimationDataLocked = true;
           animationData.set(event.data.animationData as IAnimationData);
           valueStore.set(event.data.valueStore as IValueStore);

@@ -30,23 +30,23 @@ Create a `vario.config.json` file in the root of your project, containing the fo
 
 ```json
 {
-  "animationFiles": "./src/animations"
+  "animationFiles": {
+    "variomotion-site": "./src/animation.json"
+  }
 }
 ```
-
-Create the folder where you want to store your animation data, in this case: `/src/animations`.
 
 ## Create empty animation file
 
 From the root of your project run:
 
 ```bash
-touch ./src/animations/animation.json ; echo "{\"metaData\": { \"fileName\": \"animation.json\" }}" > ./src/animations/animation.json
+touch ./src/animation.json ; echo "{}" > ./src/animation.json
 ```
 
 ## Connect variomotion to your app
 
-Almost there! We can start connecting variomotion to your app. For our react app open the `App.tsx` file.
+Now we can start connecting variomotion to our app. Open the `App.tsx` file.
 Add the follwing code snippets:
 
 ### imports
@@ -55,7 +55,16 @@ Import the variomotion package, and the animation file.
 
 ```javascript
 import variomotion from "@variomotion/core";
-import animationData from "./animations/animation.json";
+import animationData from "./animation.json";
+```
+
+### Create a project
+
+Create a project, notice how the name of the project matches the key in the `vario.config.json` file.
+
+```javascript
+const { project: varioProject, target } =
+  variomotion.project("variomotion-site");
 ```
 
 ### Connect variomotion
@@ -67,19 +76,15 @@ useEffect(() => {
   async function initVariomotion() {
     // Connect to the Variomotion Editor in development mode
     if (process.env.NODE_ENV === "development") {
+      // Connect the editor
       const { connectEditor } = await import("@variomotion/editor-connect");
 
-      // Connect the editor
-      await connectEditor(variomotion, async () => {
-        return variomotion.init({
-          animationData,
-        });
+      await connectEditor(async () => {
+        return varioProject.init(animationData, {});
       });
     } else {
       // For production, we dont want to connect to the editor
-      await variomotion.init({
-        animationData,
-      });
+      await varioProject.init(animationData, {});
     }
   }
   initVariomotion();
@@ -88,10 +93,10 @@ useEffect(() => {
 
 ### Expose the elements you want to animate
 
-The last step before we can start animating, is expsosing elements for animation using the data-v attribute:
+The last step before we can start animating, is expsosing elements for animation using the `data-v` attribute in combination with the `target` function:
 
-```html
-<div data-v="logo">
+```jsx
+<div data-v={target("logo")}>
   <img src="{logo}" className="App-logo" alt="logo" />
 </div>
 ```

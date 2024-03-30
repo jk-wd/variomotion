@@ -35,7 +35,9 @@
       $animationData ?? ({} as IAnimationData),
       {
         id,
-        domQueries: selectedDomTargets,
+        domQueries: selectedDomTargets.map(
+          (target) => `[data-v~=\"${target}\"]`
+        ),
         frames: [emptyFrame],
         name,
       }

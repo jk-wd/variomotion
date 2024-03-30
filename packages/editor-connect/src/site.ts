@@ -33,7 +33,11 @@ let scrollToInterval: NodeJS.Timeout;
 let socketChannelId: string | undefined;
 let project: VariomotionProject;
 
-export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
+export function sendSiteEvent(
+  type: SocketEvent["type"],
+  data: unknown,
+  project: VariomotionProject
+) {
   const socket = getSocket();
   if (!socketChannelId || !socket) {
     return;
@@ -46,32 +50,41 @@ export function sendSiteEvent(type: SocketEvent["type"], data: unknown) {
       host: window.location.host,
       data,
       domTargets: getDomTargetsSite(),
+      scopeId: project.scopeId,
     } as SocketEventSite)
   );
 }
 
 export const sendTimelineStatesToEditor = (project: VariomotionProject) => {
-  sendSiteEvent("send-timeline-states-to-editor", {
-    timelineStates: project.timelineStates,
-    pixelTimelineStates: project.pixelTimelineStates,
-  });
+  sendSiteEvent(
+    "send-timeline-states-to-editor",
+    {
+      timelineStates: project.timelineStates,
+      pixelTimelineStates: project.pixelTimelineStates,
+    },
+    project
+  );
 };
 
 export const sendDimensionsToEditor = (dimensions: DomtargetDimensions) => {
-  sendSiteEvent("send-dimensions-to-editor", dimensions);
+  sendSiteEvent("send-dimensions-to-editor", dimensions, project);
 };
 
 export const sendAnimationDataToEditor = (project: VariomotionProject) => {
   const animationData = project.animationData;
-  sendSiteEvent("send-animation-data-to-editor", {
-    animationData: {
-      ...project.animationData,
-      metaData: {
-        ...(animationData.metaData ?? {}),
+  sendSiteEvent(
+    "send-animation-data-to-editor",
+    {
+      animationData: {
+        ...project.animationData,
+        metaData: {
+          ...(animationData.metaData ?? {}),
+        },
       },
+      valueStore: project.valueStore,
     },
-    valueStore: project.valueStore,
-  });
+    project
+  );
 };
 
 export const connectEditor = async (

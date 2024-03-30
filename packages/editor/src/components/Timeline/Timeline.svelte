@@ -86,7 +86,11 @@
         <div class="animation-entries">
           <div class="names">
             {#each getEntriesLocal(timeline.id, $animationData) as entry}
-              <TimelineEntry isSequenceEntry={isSequenceEntry(entry)} {entry} />
+              <TimelineEntry
+                isSequenceEntry={isSequenceEntry(entry)}
+                {entry}
+                timelineId={timeline.id}
+              />
             {/each}
           </div>
           <div class="frame-numbers">

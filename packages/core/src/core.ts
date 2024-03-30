@@ -64,13 +64,13 @@ export class VariomotionProject {
 
   init(
     animationData: IAnimationData,
-    valueStore: IValueStore
+    valueStore?: IValueStore
   ): VariomotionProject {
     this.animationData = animationData;
     this.valueStore = {
       ...this.valueStore,
       ...animationData?.valueStore,
-      ...valueStore,
+      ...(valueStore ?? {}),
     };
     this.processAnimationData();
 

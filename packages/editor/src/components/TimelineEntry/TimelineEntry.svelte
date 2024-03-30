@@ -1,19 +1,40 @@
 <script lang="ts">
   import {
+    addFrame,
     deleteEntry,
     getBreakpointById,
     type IAnimationEntry,
   } from "@variomotion/core";
   import { animationData } from "../../stores/animation-data-store";
-  import { activeBreakpoint, activePopup } from "../../stores/ui-state-store";
-  import { setUrlRequestParam } from "$lib/helpers";
+  import { activePopup, pixelTimelineMode } from "../../stores/ui-state-store";
+  import { getTimelineState, setUrlRequestParam } from "$lib/helpers";
 
   import { page } from "$app/stores";
 
   import Icon from "@iconify/svelte";
   import BreakpointDot from "../BreakpointDot/BreakpointDot.svelte";
+  import { timelineStates } from "../../stores/timeline-states";
   export let isSequenceEntry = false;
   export let entry: IAnimationEntry;
+  export let timelineId: string;
+
+  let playing: boolean | undefined = false;
+  let progress: number = 0;
+
+  console.log(timelineId);
+  timelineStates.subscribe((timelineStatesStore) => {
+    const timelineState = getTimelineState(
+      timelineStatesStore,
+      timelineId,
+      $pixelTimelineMode
+    );
+    if (!timelineId || !timelineState) {
+      return;
+    }
+
+    playing = !timelineState.pause;
+    progress = timelineState.progress ?? 0;
+  });
 
   function getBreakpoints(entry: IAnimationEntry) {
     return (entry.activeOnBreakpoints ?? []).map((breakpointId: string) => {
@@ -33,6 +54,18 @@
     <div class="entry-buttons">
       <button
         class="entry-icon-button"
+        on:click={() => {
+          $animationData = deleteEntry($animationData, entry.id);
+        }}
+      >
+        <Icon
+          style="width: 16px; height: 16px;"
+          color="#ff0000"
+          icon="material-symbols-light:delete-outline"
+        />
+      </button>
+      <button
+        class="entry-icon-button"
         on:click={async () => {
           await setUrlRequestParam("entryid", entry.id, $page.url);
           if (isSequenceEntry) {
@@ -47,16 +80,22 @@
           icon="material-symbols-light:edit-square-outline-rounded"
         />
       </button>
+
       <button
-        class="entry-icon-button"
+        class={`entry-icon-button ${playing ? "disabled" : ""}`}
         on:click={() => {
-          $animationData = deleteEntry($animationData, entry.id);
+          if (!playing) {
+            $animationData = addFrame($animationData, entry.id, {
+              framePositionValue: progress,
+              frameUnit: $pixelTimelineMode ? "px" : "ms",
+              valueDef: {},
+            });
+          }
         }}
       >
         <Icon
           style="width: 16px; height: 16px;"
-          color="#ff0000"
-          icon="material-symbols-light:delete-outline"
+          icon="material-symbols-light:target"
         />
       </button>
     </div>
@@ -79,6 +118,9 @@
     margin-left: 3px;
     position: relative;
     top: 3px;
+  }
+  .entry-icon-button.disabled {
+    opacity: 0.5;
   }
   .entry-name > span {
     display: inline-block;

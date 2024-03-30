@@ -37,3 +37,4 @@ export const selectedFrame = writable<{
 export const viewportWidth = writable<number | null>(null);
 export const activeBreakpoint = writable<string>(NoBreakpointIdentifier);
 export const timelineValuePerPixel = writable<number>(20);
+export const scopeId = writable<string>("");
