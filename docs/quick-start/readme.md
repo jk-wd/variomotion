@@ -96,7 +96,7 @@ useEffect(() => {
 
 The last step before we can start animating, is expsosing elements for animation using the `data-v` attribute in combination with the `target` function:
 
-```jsx
+```JSX
 <div data-v={target("logo")}>
   <img src="{logo}" className="App-logo" alt="logo" />
 </div>
