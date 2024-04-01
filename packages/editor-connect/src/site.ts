@@ -90,11 +90,17 @@ export const sendAnimationDataToEditor = (project: VariomotionProject) => {
 export const connectEditor = async (
   initCallback: () => Promise<VariomotionProject>
 ): Promise<VariomotionProject> => {
-  if (project) {
+  if (project && project.animationData) {
     project.processAnimationData();
     return project;
   }
-  await setupSocket(8787);
+  try {
+    await setupSocket(8787);
+  } catch (e) {
+    console.warn("Failed to connect to editor");
+    project = await initCallback();
+    return project;
+  }
   await setDomTargetDimensions();
   project = await initCallback();
   const socket = getSocket();

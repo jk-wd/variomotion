@@ -12,6 +12,9 @@ export const initEditorSocket = async (
   port: number
 ) => {
   const socket = await setupSocket(port);
+  if (!socket) {
+    return;
+  }
   socketChannelId = socketChannelIdParam;
   const registerEvent: SocketEvent = {
     socketChannelId,
