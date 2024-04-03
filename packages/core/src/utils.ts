@@ -41,7 +41,7 @@ export const numberIsSet = (value?: number): boolean => {
 export const calculatePageScroll = (startPos: number = 0) => {
   const documentElement = document.documentElement || document.body;
   const scrollHeight = documentElement.scrollHeight;
-  const scrollOffset = window.pageYOffset || documentElement.scrollTop;
+  const scrollOffset = window.scrollY || documentElement.scrollTop;
   const scrollOffsetMinStart = Math.max(scrollOffset - startPos, 0);
   const percentage =
     scrollOffsetMinStart / (scrollHeight - documentElement.clientHeight);

@@ -27,7 +27,7 @@ export const project = (projectName: string): IProjectStoreItem => {
   const scopeId = generateShortUID();
   projectStore[projectName] = {
     target: (id: string) => `${scopeId} ${id}`,
-    project: new VariomotionProject(scopeId),
+    project: new VariomotionProject(scopeId, projectName),
   };
   return projectStore[projectName];
 };

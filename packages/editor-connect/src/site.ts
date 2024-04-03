@@ -79,6 +79,7 @@ export const sendAnimationDataToEditor = (project: VariomotionProject) => {
         ...project.animationData,
         metaData: {
           ...(animationData.metaData ?? {}),
+          projectName: project.name,
         },
       },
       valueStore: project.valueStore,

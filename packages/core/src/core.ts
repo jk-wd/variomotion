@@ -53,13 +53,15 @@ export class VariomotionProject {
   onAnimationFrameCallbacks: (() => void)[] = [];
   valueStore: IValueStore = {};
   scopeId: string = "";
+  name: string = "";
 
   timelineStates: {
     [key: string]: ITimelineState;
   } = {};
 
-  constructor(scopeId: string) {
+  constructor(scopeId: string, projectName: string) {
     this.scopeId = scopeId;
+    this.name = projectName;
   }
 
   init(
@@ -380,12 +382,6 @@ export class VariomotionProject {
         );
       } else if (numberIsSet(timeline.startPixel)) {
         this.pixelTimelineStates[timeline.id].start = timeline.startPixel;
-      } else if (
-        !numberIsSet(this.pixelTimelineStates[timeline.id].start) &&
-        document.body
-      ) {
-        this.pixelTimelineStates[timeline.id].start =
-          document.body.getBoundingClientRect().y;
       } else {
         this.pixelTimelineStates[timeline.id].start = 0;
       }
@@ -429,6 +425,7 @@ export class VariomotionProject {
         document.body.style.height = `${this.lastPixel + window.innerHeight}px`;
       }
     }
+    console.log(timelineState);
   }
 
   updateExistingAnimations(animation: IAnimation, pixelBased: boolean = false) {
