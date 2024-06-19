@@ -1,4 +1,6 @@
-# Variomotion
+# Variomotion (unmaintained)
+
+This project is currently unmaintained!
 
 Welcome to variomotion
 ![Variomotion](variomotion-editor-screenshot.png)
